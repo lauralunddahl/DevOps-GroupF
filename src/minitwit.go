@@ -8,12 +8,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func connect_db() {
-	db, err := sql.Open("sqlite3", "home/parallels/Desktop/DevOps/DevOps-GroupF/minitwit.db")
+var DB *sql.DB
+/*func connect_db() {
+	db, err := sql.Open("sqlite3", "../minitwit.db")
 	checkErr(err)
-	fmt.Printf(err.Error())
-	db.Close()
-}
+    }*/
 
 func checkErr(err error) {
 	if err != nil {
@@ -25,8 +24,25 @@ func helloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World")
 }
 
+func booksIndex(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("sqlite3", "../minitwit.db")
+	checkErr(err)
+    rows, err := db.Query("Select * from user")
+    checkErr(err)
+
+    for rows.Next() {
+		var username string
+		var user_id string
+		var email string
+		var pw_hash string
+        err := rows.Scan(&user_id,&username,&email,&pw_hash)
+		checkErr(err)
+		fmt.Fprintln(w, username)
+	}
+}     
+
+
 func main() {
-	connect_db()
-	http.HandleFunc("/", helloWorld)
+	http.HandleFunc("/", booksIndex)
 	http.ListenAndServe(":8080", nil)
 }
