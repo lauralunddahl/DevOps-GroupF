@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strings"
@@ -20,7 +21,13 @@ const debug bool = true
 const secret_key string = "development key"
 
 var DB *sql.DB = connect_db()
-var user *sql.Rows
+
+type User struct {
+	Username string
+	UserId   string
+	Email    string
+	PwHash   string
+}
 
 func connect_db() (DB *sql.DB) {
 	db, err := sql.Open("sqlite3", database)
@@ -60,18 +67,33 @@ func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 	return func(w http.ResponseWriter, r *http.Request) {
 		//params :=
 		//user_id := params["user_id"]
-		user = query_db("select * from user where user_id = ?", "1", true) //hardcoded user_id right now
-		defer user.Close()
-		var username string
-		var user_id string
-		var email string
-		var pw_hash string
-		for user.Next() {
-			err := user.Scan(&user_id, &username, &email, &pw_hash)
+		rows := query_db("select * from user where user_id = ?", "1", true) //hardcoded user_id right now
+		defer rows.Close()
+		var user User
+		for rows.Next() {
+			err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.PwHash)
 			checkErr(err)
 		}
-		fmt.Fprintln(w, email)
 		handler(w, r)
+	}
+}
+
+//Not sure if we need the after_request function
+
+func timeline(w http.ResponseWriter, r *http.Request) {
+	println(w, "We got a visitor from: "+r.RemoteAddr)
+	//if (user.user_id < 0) //redirect to public_timeline
+	user := User{
+		Username: "Nanna",
+		Email:    "nanm@itu.dk",
+		UserId:   "42",
+		PwHash:   "htjdejoi",
+	}
+	tmpl, _ := template.ParseFiles("../templates/tmp.html")
+
+	err := tmpl.Execute(w, user)
+	if err != nil {
+		fmt.Fprintln(w, err)
 	}
 }
 
@@ -98,7 +120,7 @@ func booksIndex(w http.ResponseWriter, r *http.Request) {
 func main() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/", before_request(booksIndex))
+	router.HandleFunc("/", before_request(timeline))
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
