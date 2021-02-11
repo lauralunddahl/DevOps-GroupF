@@ -47,7 +47,7 @@ func format_datetime(timestamp string) string {
 func gravatar_url(email string) string {
 	size := 80
 	h := sha1.New()
-	h.Write(strings.ToLower(strings.TrimSpace(email)))
+	h.Write([]byte(strings.ToLower(strings.TrimSpace(email))))
 	sha1_hash := hex.EncodeToString(h.Sum(nil))
 	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", sha1_hash, size)
 }
@@ -76,4 +76,6 @@ func booksIndex(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", booksIndex)
 	http.ListenAndServe(":8080", nil)
+
+	defer DB.Close()
 }
