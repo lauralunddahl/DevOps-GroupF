@@ -132,19 +132,19 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, err)
 	}
 }
-
-func userTimeline(){
-}
-
-func followUser(){
-
-}
-
+//Laura
+func userTimeline(){}
+func followUser(){}
 func unfollowUser(){}
+
 func addMessage(){}
+//marcus
 func login(){}
+//Nanna
 func register(){}
+//Louise
 func logout(){}
+
 
 
 
