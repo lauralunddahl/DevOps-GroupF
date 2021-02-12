@@ -117,7 +117,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		PwHash:   "htjdejoi",
 	}*/
 	
-	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?",string(per_page),false)
+	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?","30",false)
 	defer rows.Close()
 	var timelines []Timeline
 	var timeline Timeline
@@ -125,15 +125,17 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
 		&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
 		checkErr(err)
-		timelines = append(timelines,Timeline{UserId: timeline.UserId, Username: timeline.Username,
-		Email: timeline.Email, PwHash: timeline.PwHash, MessageId: timeline.MessageId, AuthorId: timeline.AuthorId,
-		Text: timeline.Text, PubDate: timeline.PubDate, Flagged: timeline.Flagged})
+		timelines = append(timelines,timeline)
 	}
-	printSlice(timelines)
-	templ, _ := template.ParseFiles("../templates/tmp.html")
+	//printSlice(timelines)
+	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+	//templ, _ := template.ParseFiles("../templates/tmp.html")
 	//pubTimeline, _ := template.ParseFiles("../templates/timeline.html")
+	
 
-	err := templ.Execute(w, timelines)
+	err := templ.Execute(w, map[string]interface{}{
+		"timeline": timelines,
+    });
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}

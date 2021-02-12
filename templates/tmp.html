@@ -7,14 +7,19 @@
     <title>Go Template</title>
 </head>
 
-<body>
-    <!--<h1>Hello, {{.User.Username}}</h1>
-    <p>Your email is {{.User.Email}}</p> -->
+<body> 
+    {{if eq 0  (len .timeline)}}
+    <h1>lort</h1>
+    
+   
+    {{else}}
     <ul class=messages>
-        {{ if .timelines}} 
           {{ range .timeline }}
           <li>{{.Username}}</li>
-    </ul>
+          {{end}}
+     </ul>
+    {{end}}
+     
 </body>
 
 </html>
