@@ -109,13 +109,6 @@ func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 
 func timeline(w http.ResponseWriter, r *http.Request) {
 	println(w, "We got a visitor from: "+r.RemoteAddr)
-	//if (user.user_id < 0) //redirect to public_timeline
-	/*user := User{
-		Username: "Nanna",
-		Email:    "nanm@itu.dk",
-		UserId:   "42",
-		PwHash:   "htjdejoi",
-	}*/
 	
 	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?","30",false)
 	defer rows.Close()
@@ -127,10 +120,9 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		checkErr(err)
 		timelines = append(timelines,timeline)
 	}
-	//printSlice(timelines)
+	
 	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
-	//templ, _ := template.ParseFiles("../templates/tmp.html")
-	//pubTimeline, _ := template.ParseFiles("../templates/timeline.html")
+	
 	
 
 	err := templ.Execute(w, map[string]interface{}{
@@ -141,6 +133,22 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func userTimeline(){
+}
+
+func followUser(){
+
+}
+
+func unfollowUser(){}
+func addMessage(){}
+func login(){}
+func register(){}
+func logout(){}
+
+
+
+
 func printSlice(s []Timeline) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
@@ -150,19 +158,6 @@ func checkErr(err error) {
 	}
 }
 
-func booksIndex(w http.ResponseWriter, r *http.Request) {
-	rows := query_db("Select * from user where username = ?", "a", false)
-	defer rows.Close()
-	for rows.Next() {
-		var username string
-		var user_id string
-		var email string
-		var pw_hash string
-		err := rows.Scan(&user_id, &username, &email, &pw_hash)
-		checkErr(err)
-		fmt.Fprintln(w, username)
-	}
-}
 
 func main() {
 	
