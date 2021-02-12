@@ -21,6 +21,7 @@ const debug bool = true
 const secret_key string = "development key"
 
 var DB *sql.DB = connect_db()
+var router = mux.NewRouter()
 
 type User struct {
 	Username string
@@ -28,6 +29,32 @@ type User struct {
 	Email    string
 	PwHash   string
 }
+
+type Message struct {
+	MessageId string
+	AuthorId  string
+	Text 	  string
+	PubDate   string
+	Flagged   int
+
+
+}
+
+type Timeline struct {
+	Username string
+	UserId   int
+	Email    string
+	PwHash   string
+	
+	MessageId int
+	AuthorId  int
+	Text 	  string
+	PubDate   int
+	Flagged   int
+}
+
+
+ 
 
 func connect_db() (DB *sql.DB) {
 	db, err := sql.Open("sqlite3", database)
@@ -83,20 +110,38 @@ func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 func timeline(w http.ResponseWriter, r *http.Request) {
 	println(w, "We got a visitor from: "+r.RemoteAddr)
 	//if (user.user_id < 0) //redirect to public_timeline
-	user := User{
+	/*user := User{
 		Username: "Nanna",
 		Email:    "nanm@itu.dk",
 		UserId:   "42",
 		PwHash:   "htjdejoi",
+	}*/
+	
+	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?",string(per_page),false)
+	defer rows.Close()
+	var timelines []Timeline
+	var timeline Timeline
+	for rows.Next() {
+		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
+		&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
+		checkErr(err)
+		timelines = append(timelines,Timeline{UserId: timeline.UserId, Username: timeline.Username,
+		Email: timeline.Email, PwHash: timeline.PwHash, MessageId: timeline.MessageId, AuthorId: timeline.AuthorId,
+		Text: timeline.Text, PubDate: timeline.PubDate, Flagged: timeline.Flagged})
 	}
-	tmpl, _ := template.ParseFiles("../templates/tmp.html")
+	printSlice(timelines)
+	templ, _ := template.ParseFiles("../templates/tmp.html")
+	//pubTimeline, _ := template.ParseFiles("../templates/timeline.html")
 
-	err := tmpl.Execute(w, user)
+	err := templ.Execute(w, timelines)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 }
 
+func printSlice(s []Timeline) {
+	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
+}
 func checkErr(err error) {
 	if err != nil {
 		panic(err)
@@ -118,7 +163,7 @@ func booksIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	router := mux.NewRouter()
+	
 
 	router.HandleFunc("/", before_request(timeline))
 
