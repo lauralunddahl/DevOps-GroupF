@@ -154,7 +154,6 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		println("i dont want to be here")
 		user_id := session.Values["userid"].(int)
 		rows := query_db_multiple3("select user.*, message.* from message, user where message.flagged = 0 and message.author_id = user.user_id and (user.user_id = ? or user.user_id in (select whom_id from follower where who_id = ?)) order by message.pub_date desc limit ?", strconv.Itoa(user_id), strconv.Itoa(user_id), strconv.Itoa(per_page))
-
 		defer rows.Close()
 		var timelines []Timeline
 		var timeline Timeline
@@ -165,7 +164,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			timelines = append(timelines, timeline)
 		}
 
-		templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+		templ := template.Must(template.ParseFiles("../templates/tmp.html", "../templates/layout.html"))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline": timelines,
@@ -188,6 +187,7 @@ func loginpage(w http.ResponseWriter, r *http.Request) {
 		println(err.Error())
 	}
 }
+
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	println("handle login")
 	username := r.FormValue("username")
@@ -231,7 +231,7 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 		timelines = append(timelines, timeline)
 	}
 
-	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+	templ := template.Must(template.ParseFiles("../templates/tmp.html", "../templates/layout.html"))
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
@@ -281,7 +281,7 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 			timelines = append(timelines, timeline)
 		}
 
-		templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+		templ := template.Must(template.ParseFiles("../templates/tmp.html", "../templates/layout.html"))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":    timelines,
@@ -412,7 +412,13 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 //Louise
-func logout() {}
+func logout(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "session1") //What should this be called?
+	session.Values["authenticated"] = false
+	session.Values["userId"] = ""
+	session.Save(r, w)
+	http.Redirect(w, r, "/", 302)
+}
 
 func printSlice(s []Timeline) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
@@ -424,6 +430,7 @@ func checkErr(err error) {
 }
 
 func main() {
+
 	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/register", before_request(register))
 	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
@@ -436,6 +443,7 @@ func main() {
 	router.HandleFunc("/{username}/follow", follow_user)
 	router.HandleFunc("/{username}/unfollow", unfollow_user)
 	router.HandleFunc("/add_message", add_message).Methods("POST")
+	router.HandleFunc("/logout", logout)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
