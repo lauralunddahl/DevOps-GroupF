@@ -33,11 +33,9 @@ type User struct {
 type Message struct {
 	MessageId string
 	AuthorId  string
-	Text 	  string
+	Text      string
 	PubDate   string
 	Flagged   int
-
-
 }
 
 type Timeline struct {
@@ -45,16 +43,13 @@ type Timeline struct {
 	UserId   int
 	Email    string
 	PwHash   string
-	
+
 	MessageId int
 	AuthorId  int
-	Text 	  string
+	Text      string
 	PubDate   int
 	Flagged   int
 }
-
-
- 
 
 func connect_db() (DB *sql.DB) {
 	db, err := sql.Open("sqlite3", database)
@@ -109,45 +104,52 @@ func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 
 func timeline(w http.ResponseWriter, r *http.Request) {
 	println(w, "We got a visitor from: "+r.RemoteAddr)
-	
-	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?","30",false)
+
+	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?", "30", false)
 	defer rows.Close()
 	var timelines []Timeline
 	var timeline Timeline
 	for rows.Next() {
 		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
-		&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
+			&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
 		checkErr(err)
-		timelines = append(timelines,timeline)
+		timelines = append(timelines, timeline)
 	}
-	
+
 	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
-	
-	
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
-    });
+	})
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 }
+
 //Laura
-func userTimeline(){}
-func followUser(){}
-func unfollowUser(){}
+func userTimeline() {}
+func followUser()   {}
+func unfollowUser() {}
 
-func addMessage(){}
+func addMessage() {}
+
 //marcus
-func login(){}
+func login() {}
+
 //Nanna
-func register(){}
+func register() {}
+
 //Louise
-func logout(){}
-
-
-
-
+func logout(response http.ResponseWriter, request *http.Request) {
+	cookie := &http.Cookie{
+		Name:   "session",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(response, cookie)
+	http.Redirect(response, request, "public_timeline", 302) //Missing: redirect to public timeline
+}
 
 func printSlice(s []Timeline) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
@@ -158,9 +160,7 @@ func checkErr(err error) {
 	}
 }
 
-
 func main() {
-	
 
 	router.HandleFunc("/", before_request(timeline))
 
