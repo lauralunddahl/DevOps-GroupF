@@ -8,10 +8,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -23,6 +25,12 @@ const secret_key string = "development key"
 var DB *sql.DB = connect_db()
 var router = mux.NewRouter()
 
+var (
+	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+	key   = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
+)
+
 type User struct {
 	Username string
 	UserId   string
@@ -33,11 +41,9 @@ type User struct {
 type Message struct {
 	MessageId string
 	AuthorId  string
-	Text 	  string
+	Text      string
 	PubDate   string
 	Flagged   int
-
-
 }
 
 type Timeline struct {
@@ -45,16 +51,13 @@ type Timeline struct {
 	UserId   int
 	Email    string
 	PwHash   string
-	
+
 	MessageId int
 	AuthorId  int
-	Text 	  string
+	Text      string
 	PubDate   int
 	Flagged   int
 }
-
-
- 
 
 func connect_db() (DB *sql.DB) {
 	db, err := sql.Open("sqlite3", database)
@@ -66,18 +69,29 @@ func init_db() {
 	//unsure if we are already doing this in connect_db()
 }
 
-func query_db(query string, args string, one bool) *sql.Rows {
+func query_db(query string, arg string) *sql.Rows {
 	stmt, err := DB.Prepare(query)
 	checkErr(err)
 	defer stmt.Close()
-	rows, err := stmt.Query(args)
+	rows, err := stmt.Query(arg)
 	checkErr(err)
 	return rows
 }
 
-func format_datetime(timestamp string) string {
+// TODO - fix so it can take a list of args instead
+func query_db_multiple(query string, arg1 string, arg2 string, arg3 string) *sql.Rows {
+	stmt, err := DB.Prepare(query)
+	checkErr(err)
+	defer stmt.Close()
+	rows, err := stmt.Query(arg1, arg2, arg3)
+	checkErr(err)
+	return rows
+}
+
+func format_datetime(timestamp int) string {
+	var ts = strconv.Itoa(timestamp)
 	const layout = "2016-03-28 @ 08:30"
-	t, err := time.Parse(layout, timestamp)
+	t, err := time.Parse(layout, ts)
 	checkErr(err)
 	return t.String()
 }
@@ -94,7 +108,7 @@ func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 	return func(w http.ResponseWriter, r *http.Request) {
 		//params :=
 		//user_id := params["user_id"]
-		rows := query_db("select * from user where user_id = ?", "1", true) //hardcoded user_id right now
+		rows := query_db("select * from user where user_id = ?", "1") //hardcoded user_id right now
 		defer rows.Close()
 		var user User
 		for rows.Next() {
@@ -109,45 +123,78 @@ func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 
 func timeline(w http.ResponseWriter, r *http.Request) {
 	println(w, "We got a visitor from: "+r.RemoteAddr)
-	
-	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?","30",false)
+
+	session, _ := store.Get(r, "session1")
+
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		url, err := mux.CurrentRoute(r).Subrouter().Get("public").URL()
+		if err != nil {
+			panic(err)
+		}
+		http.Redirect(w, r, url.String(), 302)
+	}
+
+	user_id := session.Values["userid"].(int)
+	rows := query_db_multiple("select user.*, message.* from message, user where message.flagged = 0 and message.author_id = user.user_id and (user.user_id = ? or user.user_id in (select whom_id from follower where who_id = ?)) order by message.pub_date desc limit ?", strconv.Itoa(user_id), strconv.Itoa(user_id), strconv.Itoa(per_page))
 	defer rows.Close()
 	var timelines []Timeline
 	var timeline Timeline
 	for rows.Next() {
 		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
-		&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
+			&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
 		checkErr(err)
-		timelines = append(timelines,timeline)
+		timelines = append(timelines, timeline)
 	}
-	
+
 	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
-	
-	
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
-    });
+	})
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 }
+
+func public_timeline(w http.ResponseWriter, r *http.Request) {
+	println(w, "We got a visitor from: "+r.RemoteAddr)
+
+	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?", strconv.Itoa(per_page))
+	defer rows.Close()
+	var timelines []Timeline
+	var timeline Timeline
+	for rows.Next() {
+		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
+			&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
+		checkErr(err)
+		timelines = append(timelines, timeline)
+	}
+
+	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+
+	err := templ.Execute(w, map[string]interface{}{
+		"timeline": timelines,
+	})
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+}
+
 //Laura
-func userTimeline(){}
-func followUser(){}
-func unfollowUser(){}
+func userTimeline() {}
+func followUser()   {}
+func unfollowUser() {}
 
-func addMessage(){}
+func addMessage() {}
+
 //marcus
-func login(){}
+func login() {}
+
 //Nanna
-func register(){}
+func register() {}
+
 //Louise
-func logout(){}
-
-
-
-
+func logout() {}
 
 func printSlice(s []Timeline) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
@@ -158,11 +205,11 @@ func checkErr(err error) {
 	}
 }
 
-
 func main() {
-	
 
 	router.HandleFunc("/", before_request(timeline))
+
+	router.HandleFunc("/public", public_timeline).Name("public")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 

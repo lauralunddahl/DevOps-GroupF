@@ -8,18 +8,22 @@
 </head>
 
 <body> 
-    {{if eq 0  (len .timeline)}}
-    <h1>lort</h1>
-    
-   
-    {{else}}
     <ul class=messages>
+    {{if eq 0 (len .timeline)}}
+        <li><em>There's no message so far.</em></li>
+    {{else}}
           {{ range .timeline }}
-          <li>{{.Username}}</li>
+          <!--TODO: figure out how to call "gravatar_url" with email-->
+          <li><img src=""><p>
+            <strong><a href="">{{ .Username }}</a></strong>
+            {{.Text}}
+            <!--TODO: figure out how to call "format_datetime" with the pubdate-->
+            <small>&mdash; {{ .PubDate }}</small> 
+          </li>
           {{end}}
-     </ul>
     {{end}}
-     
+</ul>
+
 </body>
 
 </html>
