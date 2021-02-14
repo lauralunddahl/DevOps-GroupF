@@ -267,16 +267,17 @@ func follow_user(w http.ResponseWriter, r *http.Request) {
 	}
 	if user_id == 0 {
 		http.Error(w, "not authorized", 401)
+	} else {
+		whom_id := get_user_id(username)
+		if whom_id == 0 {
+			http.NotFound(w, r)
+		}
+		stmt, _ := DB.Prepare("insert into follower (who_id, whom_id) values (?,?)")
+		_, err := stmt.Exec(user_id, whom_id)
+		checkErr(err)
+		dialog.Alert("You are now following %s", username)
+		http.Redirect(w, r, "/{username}", 302)
 	}
-	whom_id := get_user_id(username)
-	if whom_id == 0 {
-		http.NotFound(w, r)
-	}
-	stmt, _ := DB.Prepare("insert into follower (who_id, whom_id) values (?,?)")
-	_, err := stmt.Exec(user_id, whom_id)
-	checkErr(err)
-	dialog.Alert("You are now following %s", username)
-	http.Redirect(w, r, "/{username}", 302)
 }
 
 func unfollow_user(w http.ResponseWriter, r *http.Request) {
@@ -291,21 +292,36 @@ func unfollow_user(w http.ResponseWriter, r *http.Request) {
 	}
 	if user_id == 0 {
 		http.Error(w, "not authorized", 401)
+	} else {
+		whom_id := get_user_id(username)
+		if whom_id == 0 {
+			http.NotFound(w, r)
+		}
+		stmt, _ := DB.Prepare("delete from follower where who_id = ? and whom_id = ?")
+		_, err := stmt.Exec(user_id, whom_id)
+		checkErr(err)
+		dialog.Alert("You are no longer following %s", username)
+		http.Redirect(w, r, "/{username}", 302)
 	}
-	whom_id := get_user_id(username)
-	if whom_id == 0 {
-		http.NotFound(w, r)
-	}
-	stmt, _ := DB.Prepare("delete from follower where who_id = ? and whom_id = ?")
-	_, err := stmt.Exec(user_id, whom_id)
-	checkErr(err)
-	dialog.Alert("You are no longer following %s", username)
-	http.Redirect(w, r, "/{username}", 302)
 }
 
-//Laura
-
-func addMessage() {}
+func add_message(w http.ResponseWriter, r *http.Request) {
+	user_id := 0
+	session, _ := store.Get(r, "session1")
+	if auth, _ := session.Values["authenticated"].(bool); auth {
+		user_id = session.Values["userid"].(int)
+	}
+	if user_id == 0 {
+		http.Error(w, "not authorized", 401)
+	} else {
+		text := r.FormValue("text")
+		stmt, _ := DB.Prepare("insert into message (author_id, text, pub_date, flagged) values (?, ?, ?, 0)")
+		_, err := stmt.Exec(user_id, text, time.Now())
+		checkErr(err)
+		dialog.Alert("Your message was recorded")
+		http.Redirect(w, r, "/", 302)
+	}
+}
 
 //marcus
 func login() {}
@@ -375,6 +391,7 @@ func main() {
 	router.HandleFunc("/public", public_timeline).Name("public")
 	router.HandleFunc("/{username}/follow", follow_user)
 	router.HandleFunc("/{username}/unfollow", unfollow_user)
+	router.HandleFunc("/add_message", add_message).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
