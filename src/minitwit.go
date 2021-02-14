@@ -189,8 +189,12 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func user_timeline(w http.ResponseWriter, r *http.Request, username string) {
+func user_timeline(w http.ResponseWriter, r *http.Request) {
 	user_id := 0
+	vars:= mux.Vars(r)
+
+	username := vars["username"]
+
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		user_id = session.Values["userid"].(int)
@@ -266,7 +270,7 @@ func checkErr(err error) {
 func main() {
 
 	router.HandleFunc("/", before_request(timeline))
-
+	router.HandleFunc("/{username}", user_timeline)
 	router.HandleFunc("/public", public_timeline).Name("public")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
