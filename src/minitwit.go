@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -52,8 +53,11 @@ type Timeline struct {
 	PubDate   int
 	Flagged   int
 }
-
-
+var (
+	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+	key   = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
+)
  
 
 func connect_db() (DB *sql.DB) {
@@ -139,7 +143,38 @@ func unfollowUser(){}
 
 func addMessage(){}
 //marcus
-func login(){}
+func loginpage(w http.ResponseWriter, r *http.Request){
+	loginp ,err :=  template.ParseFiles("../templates/login.html")
+	if err != nil{
+		println(err.Error())
+	}
+	err = loginp.Execute(w,nil)
+	if err != nil{
+		println(err.Error())
+	}
+}
+func handleLogin(w http.ResponseWriter, r *http.Request){
+	println("handle login")
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	println(username + " " +password)
+	row := query_db("select * from user where username = ? ", username,false)
+	var user User
+		for row.Next() {
+			err := row.Scan(&user.UserId, &user.Username, &user.Email, &user.PwHash)
+			checkErr(err)
+		}
+	if user.Username == "" {
+		fmt.Println("invalid username")
+	}
+	println(user.Username)
+	//check password hash from database against input password from user
+	session, _ := store.Get(r,"session1")
+	session.Values["authenticated"] = true
+	session.Values["userId"] = user.UserId
+	session.Save(r,w)
+	http.Redirect(w,r,"/",302)
+}
 //Nanna
 func register(){}
 //Louise
@@ -163,6 +198,8 @@ func main() {
 	
 
 	router.HandleFunc("/", before_request(timeline))
+	router.HandleFunc("/login", before_request(loginpage))
+	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
