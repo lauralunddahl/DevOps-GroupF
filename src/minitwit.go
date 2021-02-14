@@ -316,13 +316,18 @@ func register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		println(err.Error())
 	}
-	err = register.Execute(w, nil)
-	if err != nil {
-		println(err.Error())
+	session, _ := store.Get(r, "session1")
+	if auth, _ := session.Values["authenticated"].(bool); auth {
+		http.Redirect(w, r, "/", 302)
+	} else {
+		err = register.Execute(w, nil)
+		if err != nil {
+			println(err.Error())
+		}
 	}
 }
 
-func handleregister(w http.ResponseWriter, r *http.Request) {
+func handleRegister(w http.ResponseWriter, r *http.Request) {
 	println("handle register")
 	err := ""
 	username := r.FormValue("username")
@@ -337,15 +342,17 @@ func handleregister(w http.ResponseWriter, r *http.Request) {
 		err += "You have to enter a password\n"
 	} else if password != password2 {
 		err += "The two passwords do not match\n"
+	} else if get_user_id(username) > 0 { //this might have to be another check at some point
+		err += "The username is already taken"
 	} else {
-		query_db("insert into user (username, email, pw_hash) values (?, ?, ?)", username, email, GenerateFromPassword([]byte(password), bcrypt.MinCost))
+		pw_hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+		if err != nil {
+			println(err.Error())
+		}
+		query_db_multiple3("insert into user (username, email, pw_hash) values (?, ?, ?)", username, email, string(pw_hash))
 		fmt.Println(w, "You were successfully registered and can login now")
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/login", 302)
 	}
-	// else if get_user_id(username) != nil {
-	// 	err += "The username is already taken"
-	// }
-
 }
 
 //Louise
@@ -361,7 +368,9 @@ func checkErr(err error) {
 }
 
 func main() {
-	router.HandleFunc("/", before_request(timeline))
+	router.HandleFunc("/", timeline)
+	router.HandleFunc("/register", before_request(register))
+	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
 	router.HandleFunc("/{username}", user_timeline)
 	router.HandleFunc("/public", public_timeline).Name("public")
 	router.HandleFunc("/{username}/follow", follow_user)
