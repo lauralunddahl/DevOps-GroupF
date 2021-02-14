@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"strconv"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
@@ -98,9 +98,9 @@ func query_db_multiple3(query string, arg1 string, arg2 string, arg3 string) *sq
 }
 
 func get_user_id(username string) int {
-	rows:= query_db("SELECT user_id from user where username = ?", username, true)
+	rows := query_db("SELECT user_id from user where username = ?", username)
 	defer rows.Close()
-	
+
 	var uid int
 
 	for rows.Next() {
@@ -112,7 +112,7 @@ func get_user_id(username string) int {
 
 func format_datetime(timestamp string) string {
 	const layout = "2016-03-28 @ 08:30"
-	t, err := time.Parse(layout, ts)
+	t, err := time.Parse(layout, timestamp)
 	checkErr(err)
 	return t.String()
 }
@@ -149,9 +149,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		url, err := mux.CurrentRoute(r).Subrouter().Get("public").URL()
-		if err != nil {
-			panic(err)
-		}
+		checkErr(err)
 		http.Redirect(w, r, url.String(), 302)
 	}
 
@@ -173,12 +171,11 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
 		"public":   false,
-	});
+	})
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 }
-
 
 func public_timeline(w http.ResponseWriter, r *http.Request) {
 	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?", strconv.Itoa(per_page))
@@ -273,26 +270,13 @@ func follow_user(w http.ResponseWriter, r *http.Request) {
 	if whom_id == 0 {
 		http.NotFound(w, r)
 	}
-	//statement, _ =
+	stmt, _ := DB.Prepare("insert into follower (who_id, whom_id) values (?,?)")
+	_, err := stmt.Exec(user_id, whom_id)
+	checkErr(err)
+	http.Redirect(w, r, "/{username}", 302)
 }
 
-// @app.route('/<username>/follow')
-// def follow_user(username):
-//     """Adds the current user as follower of the given user."""
-//     if not g.user:
-//         abort(401)
-//     whom_id = get_user_id(username)
-//     if whom_id is None:
-//         abort(404)
-//     g.db.execute('insert into follower (who_id, whom_id) values (?, ?)',
-//                 [session['user_id'], whom_id])
-//     g.db.commit()
-//     flash('You are now following "%s"' % username)
-//     return redirect(url_for('user_timeline', username=username))
-
 //Laura
-//func userTimeline() {}
-func followUser()   {}
 func unfollowUser() {}
 
 func addMessage() {}
@@ -306,8 +290,6 @@ func register() {}
 //Louise
 func logout() {}
 
-=======
->>>>>>> 92e277bae487b56d5fdbda3f0779c00db9947a15
 func printSlice(s []Timeline) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
@@ -318,17 +300,10 @@ func checkErr(err error) {
 }
 
 func main() {
-<<<<<<< HEAD
-
 	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/{username}", user_timeline)
 	router.HandleFunc("/public", public_timeline).Name("public")
-=======
-	
-	router.HandleFunc("/public", before_request(public_timeline)).Methods("GET")
-	router.HandleFunc("/", before_request(timeline))
-	
->>>>>>> 92e277bae487b56d5fdbda3f0779c00db9947a15
+	router.HandleFunc("/{username}/follow", follow_user)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
