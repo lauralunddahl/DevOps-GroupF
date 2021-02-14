@@ -191,7 +191,7 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 
 func user_timeline(w http.ResponseWriter, r *http.Request) {
 	user_id := 0
-	vars:= mux.Vars(r)
+	vars := mux.Vars(r)
 
 	username := vars["username"]
 
@@ -241,6 +241,41 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	}
 }
+
+func follow_user(w http.ResponseWriter, r *http.Request) {
+	user_id := 0
+	vars := mux.Vars(r)
+
+	username := vars["username"]
+
+	session, _ := store.Get(r, "session1")
+	if auth, _ := session.Values["authenticated"].(bool); auth {
+		user_id = session.Values["userid"].(int)
+	}
+	if user_id == 0 {
+		http.Error(w, "not authorized", 401)
+	}
+	whom_id := get_user_id(username)
+	if whom_id == 0 {
+		http.NotFound(w, r)
+	}
+	//statement, _ =
+
+}
+
+// @app.route('/<username>/follow')
+// def follow_user(username):
+//     """Adds the current user as follower of the given user."""
+//     if not g.user:
+//         abort(401)
+//     whom_id = get_user_id(username)
+//     if whom_id is None:
+//         abort(404)
+//     g.db.execute('insert into follower (who_id, whom_id) values (?, ?)',
+//                 [session['user_id'], whom_id])
+//     g.db.commit()
+//     flash('You are now following "%s"' % username)
+//     return redirect(url_for('user_timeline', username=username))
 
 //Laura
 //func userTimeline() {}
