@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"tawesoft.co.uk/go/dialog"
 )
 
 const database string = "../minitwit.db"
@@ -168,6 +169,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	println(user.Username)
 	//check password hash from database against input password from user
+	dialog.Alert("You were logged out")
 	session, _ := store.Get(r, "session1")
 	session.Values["authenticated"] = true
 	session.Values["userId"] = user.UserId
