@@ -129,15 +129,14 @@ func gravatar_url(email string) string {
 
 func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//params :=
-		//user_id := params["user_id"]
-		rows := query_db("select * from user where user_id = ?", "1") //hardcoded user_id right now
-		defer rows.Close()
-		var user User
-		for rows.Next() {
-			err := rows.Scan(&user.UserId, &user.Username, &user.Email, &user.PwHash)
-			checkErr(err)
+		session, _ := store.Get(r, "session1")
+		session.Values["authenticated"] = false
+		session.Values["userid"] = 0
+		err := session.Save(r, w)
+		if err != nil {
+			println(err.Error())
 		}
+
 		handler(w, r)
 	}
 }
@@ -150,33 +149,74 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session1")
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		url, err := mux.CurrentRoute(r).Subrouter().Get("public").URL()
-		checkErr(err)
-		http.Redirect(w, r, url.String(), 302)
+		http.Redirect(w, r, "/public", 302)
+	} else {
+		println("i dont want to be here")
+		user_id := session.Values["userid"].(int)
+		rows := query_db_multiple3("select user.*, message.* from message, user where message.flagged = 0 and message.author_id = user.user_id and (user.user_id = ? or user.user_id in (select whom_id from follower where who_id = ?)) order by message.pub_date desc limit ?", strconv.Itoa(user_id), strconv.Itoa(user_id), strconv.Itoa(per_page))
+
+		defer rows.Close()
+		var timelines []Timeline
+		var timeline Timeline
+		for rows.Next() {
+			err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
+				&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
+			checkErr(err)
+			timelines = append(timelines, timeline)
+		}
+
+		templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+
+		err := templ.Execute(w, map[string]interface{}{
+			"timeline": timelines,
+			"public":   false,
+		})
+		if err != nil {
+			fmt.Fprintln(w, err)
+		}
 	}
+}
 
-	user_id := session.Values["userid"].(int)
-	rows := query_db_multiple3("select user.*, message.* from message, user where message.flagged = 0 and message.author_id = user.user_id and (user.user_id = ? or user.user_id in (select whom_id from follower where who_id = ?)) order by message.pub_date desc limit ?", strconv.Itoa(user_id), strconv.Itoa(user_id), strconv.Itoa(per_page))
-
-	defer rows.Close()
-	var timelines []Timeline
-	var timeline Timeline
-	for rows.Next() {
-		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
-			&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
-		checkErr(err)
-		timelines = append(timelines, timeline)
-	}
-
-	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
-
-	err := templ.Execute(w, map[string]interface{}{
-		"timeline": timelines,
-		"public":   false,
-	})
+//marcus
+func loginpage(w http.ResponseWriter, r *http.Request) {
+	loginp, err := template.ParseFiles("../templates/login.html")
 	if err != nil {
-		fmt.Fprintln(w, err)
+		println(err.Error())
 	}
+	err = loginp.Execute(w, nil)
+	if err != nil {
+		println(err.Error())
+	}
+}
+func handleLogin(w http.ResponseWriter, r *http.Request) {
+	println("handle login")
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	println(username + " " + password)
+	row := query_db("select * from user where username = ? ", username)
+	var user User
+	for row.Next() {
+		err := row.Scan(&user.UserId, &user.Username, &user.Email, &user.PwHash)
+		checkErr(err)
+	}
+	if user.Username == "" {
+		fmt.Fprintln(w, "invalid username")
+	}
+	println(user.Username)
+	//check password hash from database against input password from user
+	byteHash := []byte(user.PwHash)
+	bytePw := []byte(password)
+	err := bcrypt.CompareHashAndPassword(byteHash, bytePw)
+	if err != nil {
+		println(err.Error())
+		fmt.Fprintln(w, "invalid password")
+	}
+
+	session, _ := store.Get(r, "session1")
+	session.Values["authenticated"] = true
+	session.Values["userId"] = user.UserId
+	session.Save(r, w)
+	http.Redirect(w, r, "/", 302)
 }
 
 func public_timeline(w http.ResponseWriter, r *http.Request) {
@@ -209,6 +249,9 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 
 	session, _ := store.Get(r, "session1")
+
+	//session.Values["authenticated"] = false
+	println(session.Values["authenticated"].(bool))
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		user_id = session.Values["userid"].(int)
 	}
@@ -323,9 +366,6 @@ func add_message(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//marcus
-func login() {}
-
 //Nanna
 func register(w http.ResponseWriter, r *http.Request) {
 	register, err := template.ParseFiles("../templates/register.html")
@@ -384,11 +424,15 @@ func checkErr(err error) {
 }
 
 func main() {
-	router.HandleFunc("/", timeline)
+	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/register", before_request(register))
 	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
+	router.HandleFunc("/", before_request(timeline))
+	router.HandleFunc("/login", before_request(loginpage))
+	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
+	router.HandleFunc("/public", public_timeline)
 	router.HandleFunc("/{username}", user_timeline)
-	router.HandleFunc("/public", public_timeline).Name("public")
+
 	router.HandleFunc("/{username}/follow", follow_user)
 	router.HandleFunc("/{username}/unfollow", unfollow_user)
 	router.HandleFunc("/add_message", add_message).Methods("POST")
