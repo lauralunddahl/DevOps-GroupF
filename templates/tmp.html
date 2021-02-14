@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Template</title>
 </head>
-
 <body> 
+    {{block "layout" $}} {{end}}
+
     {{if eq 0  (len .timeline)}}
     <h1>lort</h1>
     
