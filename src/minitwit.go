@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const database string = "../minitwit.db"
@@ -165,10 +166,18 @@ func handleLogin(w http.ResponseWriter, r *http.Request){
 			checkErr(err)
 		}
 	if user.Username == "" {
-		fmt.Println("invalid username")
+		fmt.Fprintln(w,"invalid username")
 	}
 	println(user.Username)
 	//check password hash from database against input password from user
+	byteHash := []byte(user.PwHash)
+	bytePw := []byte(password)
+	err := bcrypt.CompareHashAndPassword(byteHash,bytePw)
+	if err != nil{
+		println(err.Error())
+		fmt.Fprintln(w,"invalid password")
+	}
+
 	session, _ := store.Get(r,"session1")
 	session.Values["authenticated"] = true
 	session.Values["userId"] = user.UserId
