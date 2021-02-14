@@ -79,7 +79,16 @@ func query_db(query string, arg string) *sql.Rows {
 }
 
 // TODO - fix so it can take a list of args instead
-func query_db_multiple(query string, arg1 string, arg2 string, arg3 string) *sql.Rows {
+func query_db_multiple2(query string, arg1 string, arg2 string) *sql.Rows {
+	stmt, err := DB.Prepare(query)
+	checkErr(err)
+	defer stmt.Close()
+	rows, err := stmt.Query(arg1, arg2)
+	checkErr(err)
+	return rows
+}
+
+func query_db_multiple3(query string, arg1 string, arg2 string, arg3 string) *sql.Rows {
 	stmt, err := DB.Prepare(query)
 	checkErr(err)
 	defer stmt.Close()
@@ -135,7 +144,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user_id := session.Values["userid"].(int)
-	rows := query_db_multiple("select user.*, message.* from message, user where message.flagged = 0 and message.author_id = user.user_id and (user.user_id = ? or user.user_id in (select whom_id from follower where who_id = ?)) order by message.pub_date desc limit ?", strconv.Itoa(user_id), strconv.Itoa(user_id), strconv.Itoa(per_page))
+	rows := query_db_multiple3("select user.*, message.* from message, user where message.flagged = 0 and message.author_id = user.user_id and (user.user_id = ? or user.user_id in (select whom_id from follower where who_id = ?)) order by message.pub_date desc limit ?", strconv.Itoa(user_id), strconv.Itoa(user_id), strconv.Itoa(per_page))
 	defer rows.Close()
 	var timelines []Timeline
 	var timeline Timeline
@@ -150,6 +159,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
+		"public":   false,
 	})
 	if err != nil {
 		fmt.Fprintln(w, err)
@@ -157,8 +167,6 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 }
 
 func public_timeline(w http.ResponseWriter, r *http.Request) {
-	println(w, "We got a visitor from: "+r.RemoteAddr)
-
 	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?", strconv.Itoa(per_page))
 	defer rows.Close()
 	var timelines []Timeline
@@ -174,14 +182,64 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
+		"public":   true,
 	})
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 }
 
+func user_timeline(w http.ResponseWriter, r *http.Request, username string) {
+	user_id := 0
+	session, _ := store.Get(r, "session1")
+	if auth, _ := session.Values["authenticated"].(bool); auth {
+		user_id = session.Values["userid"].(int)
+	}
+	profileuserRow := query_db("select * from user where username = ?", username)
+	defer profileuserRow.Close()
+	var profileuser User
+	if profileuserRow.Next() {
+		queryErr := profileuserRow.Scan(&profileuser.UserId, &profileuser.Username, &profileuser.Email, &profileuser.PwHash)
+		checkErr(queryErr)
+
+		followedRow := query_db_multiple2("select 1 from follower where follower.who_id = ? and follower.whom_id = ?", strconv.Itoa(user_id), profileuser.UserId)
+		defer followedRow.Close()
+		followed := false
+		if followedRow.Next() {
+			followed = true
+		}
+
+		rows := query_db_multiple2("select user.*, message.* from message, user where user.user_id = message.author_id and user.user_id = ? order by message.pub_date desc limit ?", profileuser.UserId, strconv.Itoa(per_page))
+
+		defer rows.Close()
+		var timelines []Timeline
+		var timeline Timeline
+		for rows.Next() {
+			err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
+				&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
+			checkErr(err)
+			timelines = append(timelines, timeline)
+		}
+
+		templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+
+		err := templ.Execute(w, map[string]interface{}{
+			"timeline":    timelines,
+			"public":      false,
+			"profileuser": profileuser,
+			"followed":    followed,
+		})
+		if err != nil {
+			fmt.Fprintln(w, err)
+		}
+
+	} else {
+		http.NotFound(w, r)
+	}
+}
+
 //Laura
-func userTimeline() {}
+//func userTimeline() {}
 func followUser()   {}
 func unfollowUser() {}
 
