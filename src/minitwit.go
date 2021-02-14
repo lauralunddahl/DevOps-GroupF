@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"strconv"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
@@ -97,8 +97,20 @@ func query_db_multiple3(query string, arg1 string, arg2 string, arg3 string) *sq
 	return rows
 }
 
-func format_datetime(timestamp int) string {
-	var ts = strconv.Itoa(timestamp)
+func get_user_id(username string) int {
+	rows:= query_db("SELECT user_id from user where username = ?", username, true)
+	defer rows.Close()
+	
+	var uid int
+
+	for rows.Next() {
+		err := rows.Scan(&uid)
+		checkErr(err)
+	}
+	return uid
+}
+
+func format_datetime(timestamp string) string {
 	const layout = "2016-03-28 @ 08:30"
 	t, err := time.Parse(layout, ts)
 	checkErr(err)
@@ -153,6 +165,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
 		checkErr(err)
 		timelines = append(timelines, timeline)
+
 	}
 
 	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
@@ -160,11 +173,12 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
 		"public":   false,
-	})
+	});
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 }
+
 
 func public_timeline(w http.ResponseWriter, r *http.Request) {
 	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?", strconv.Itoa(per_page))
@@ -260,7 +274,6 @@ func follow_user(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	}
 	//statement, _ =
-
 }
 
 // @app.route('/<username>/follow')
@@ -293,6 +306,8 @@ func register() {}
 //Louise
 func logout() {}
 
+=======
+>>>>>>> 92e277bae487b56d5fdbda3f0779c00db9947a15
 func printSlice(s []Timeline) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
@@ -303,10 +318,17 @@ func checkErr(err error) {
 }
 
 func main() {
+<<<<<<< HEAD
 
 	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/{username}", user_timeline)
 	router.HandleFunc("/public", public_timeline).Name("public")
+=======
+	
+	router.HandleFunc("/public", before_request(public_timeline)).Methods("GET")
+	router.HandleFunc("/", before_request(timeline))
+	
+>>>>>>> 92e277bae487b56d5fdbda3f0779c00db9947a15
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
