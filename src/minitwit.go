@@ -367,7 +367,49 @@ func add_message(w http.ResponseWriter, r *http.Request) {
 }
 
 //Nanna
-func register() {}
+func register(w http.ResponseWriter, r *http.Request) {
+	register, err := template.ParseFiles("../templates/register.html")
+	if err != nil {
+		println(err.Error())
+	}
+	session, _ := store.Get(r, "session1")
+	if auth, _ := session.Values["authenticated"].(bool); auth {
+		http.Redirect(w, r, "/", 302)
+	} else {
+		err = register.Execute(w, nil)
+		if err != nil {
+			println(err.Error())
+		}
+	}
+}
+
+func handleRegister(w http.ResponseWriter, r *http.Request) {
+	println("handle register")
+	err := ""
+	username := r.FormValue("username")
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	password2 := r.FormValue("password2")
+	if len(username) == 0 {
+		err = "You have to enter a username\n"
+	} else if len(email) == 0 || strings.Contains(email, "@") {
+		err += "You have to enter a vlid email address\n"
+	} else if len(password) == 0 {
+		err += "You have to enter a password\n"
+	} else if password != password2 {
+		err += "The two passwords do not match\n"
+	} else if get_user_id(username) > 0 { //this might have to be another check at some point
+		err += "The username is already taken"
+	} else {
+		pw_hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+		if err != nil {
+			println(err.Error())
+		}
+		query_db_multiple3("insert into user (username, email, pw_hash) values (?, ?, ?)", username, email, string(pw_hash))
+		fmt.Println(w, "You were successfully registered and can login now")
+		http.Redirect(w, r, "/login", 302)
+	}
+}
 
 //Louise
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -389,6 +431,9 @@ func checkErr(err error) {
 
 func main() {
 
+	router.HandleFunc("/", before_request(timeline))
+	router.HandleFunc("/register", before_request(register))
+	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
 	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/login", before_request(loginpage))
 	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
