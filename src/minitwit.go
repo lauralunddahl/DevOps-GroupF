@@ -179,15 +179,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 func register() {}
 
 //Louise
-func logout(response http.ResponseWriter, request *http.Request) {
-	cookie := &http.Cookie{
-		Name:   "session",
-		Value:  "",
-		Path:   "/",
-		MaxAge: -1,
-	}
-	http.SetCookie(response, cookie)
-	http.Redirect(response, request, "public_timeline", 302) //Missing: redirect to public timeline
+func logout(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "session1") //What should this be called?
+	session.Values["authenticated"] = false
+	session.Values["userId"] = ""
+	session.Save(r, w)
+	http.Redirect(w, r, "/", 302)
 }
 
 func printSlice(s []Timeline) {
@@ -204,6 +201,7 @@ func main() {
 	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/login", before_request(loginpage))
 	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
+	router.HandleFunc("/logout", logout)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
