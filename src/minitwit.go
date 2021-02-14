@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
+	"strconv"
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -54,8 +54,6 @@ type Timeline struct {
 }
 
 
- 
-
 func connect_db() (DB *sql.DB) {
 	db, err := sql.Open("sqlite3", database)
 	checkErr(err)
@@ -73,6 +71,19 @@ func query_db(query string, args string, one bool) *sql.Rows {
 	rows, err := stmt.Query(args)
 	checkErr(err)
 	return rows
+}
+
+func get_user_id(username string) int {
+	rows:= query_db("SELECT user_id from user where username = ?", username, true)
+	defer rows.Close()
+	
+	var uid int
+
+	for rows.Next() {
+		err := rows.Scan(&uid)
+		checkErr(err)
+	}
+	return uid
 }
 
 func format_datetime(timestamp string) string {
@@ -119,12 +130,11 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
 		checkErr(err)
 		timelines = append(timelines,timeline)
+		
 	}
 	
 	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
 	
-	
-
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
     });
@@ -132,6 +142,34 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, err)
 	}
 }
+
+func public_timeline(w http.ResponseWriter, r *http.Request) {
+	println(w, "We got a visitor from: "+r.RemoteAddr)
+
+	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?",strconv.Itoa(per_page),false)
+	defer rows.Close()
+	var timelines []Timeline
+	var timeline Timeline
+	for rows.Next() {
+		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
+		&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
+		checkErr(err)
+
+		timelines = append(timelines,timeline)
+	}
+	
+	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+
+	err := templ.Execute(w, map[string]interface{}{
+		"timeline": timelines,
+    });
+
+
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+}
+
 //Laura
 func userTimeline(){}
 func followUser(){}
@@ -146,9 +184,6 @@ func register(){}
 func logout(){}
 
 
-
-
-
 func printSlice(s []Timeline) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
@@ -161,8 +196,9 @@ func checkErr(err error) {
 
 func main() {
 	
-
+	router.HandleFunc("/public", before_request(public_timeline)).Methods("GET")
 	router.HandleFunc("/", before_request(timeline))
+	
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
