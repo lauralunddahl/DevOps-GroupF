@@ -15,6 +15,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"tawesoft.co.uk/go/dialog"
 )
 
 const database string = "../minitwit.db"
@@ -273,11 +274,35 @@ func follow_user(w http.ResponseWriter, r *http.Request) {
 	stmt, _ := DB.Prepare("insert into follower (who_id, whom_id) values (?,?)")
 	_, err := stmt.Exec(user_id, whom_id)
 	checkErr(err)
+	dialog.Alert("You are now following %s", username)
+	http.Redirect(w, r, "/{username}", 302)
+}
+
+func unfollow_user(w http.ResponseWriter, r *http.Request) {
+	user_id := 0
+	vars := mux.Vars(r)
+
+	username := vars["username"]
+
+	session, _ := store.Get(r, "session1")
+	if auth, _ := session.Values["authenticated"].(bool); auth {
+		user_id = session.Values["userid"].(int)
+	}
+	if user_id == 0 {
+		http.Error(w, "not authorized", 401)
+	}
+	whom_id := get_user_id(username)
+	if whom_id == 0 {
+		http.NotFound(w, r)
+	}
+	stmt, _ := DB.Prepare("delete from follower where who_id = ? and whom_id = ?")
+	_, err := stmt.Exec(user_id, whom_id)
+	checkErr(err)
+	dialog.Alert("You are no longer following %s", username)
 	http.Redirect(w, r, "/{username}", 302)
 }
 
 //Laura
-func unfollowUser() {}
 
 func addMessage() {}
 
@@ -304,6 +329,7 @@ func main() {
 	router.HandleFunc("/{username}", user_timeline)
 	router.HandleFunc("/public", public_timeline).Name("public")
 	router.HandleFunc("/{username}/follow", follow_user)
+	router.HandleFunc("/{username}/unfollow", unfollow_user)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
