@@ -124,7 +124,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		timelines = append(timelines, timeline)
 	}
 
-	templ := template.Must(template.ParseFiles("../templates/tmp.html"))
+	templ := template.Must(template.ParseFiles("../templates/tmp.html", "../templates/layout.html"))
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,

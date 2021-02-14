@@ -1,3 +1,4 @@
+{{define "layout"}}
 <!doctype html>
 <title>Welcome | MiniTwit</title>
 <link rel="stylesheet" href="/static/style.css">
@@ -14,20 +15,10 @@
     <a href="/">sign out {{ .Username }}</a>    
   {{ end }}
   </div>
-  <!-- Dialog messages:
-    {% with flashes = get_flashed_messages() %}
-    {% if flashes %}
-      <ul class=flashes>
-      {% for message in flashes %}
-        <li>{{ message }}
-      {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
-  -->
   <div class="body">
   </div>
   <div class="footer">
     MiniTwit &mdash; A Go Application
   </div>
 </div>
+{{end}}
