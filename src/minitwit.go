@@ -302,9 +302,22 @@ func unfollow_user(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/{username}", 302)
 }
 
-//Laura
-
-func addMessage() {}
+func add_message(w http.ResponseWriter, r *http.Request) {
+	user_id := 0
+	session, _ := store.Get(r, "session1")
+	if auth, _ := session.Values["authenticated"].(bool); auth {
+		user_id = session.Values["userid"].(int)
+	}
+	if user_id == 0 {
+		http.Error(w, "not authorized", 401)
+	}
+	text := r.FormValue("text")
+	stmt, _ := DB.Prepare("insert into message (author_id, text, pub_date, flagged) values (?, ?, ?, 0)")
+	_, err := stmt.Exec(user_id, text, time.Now())
+	checkErr(err)
+	dialog.Alert("Your message was recorded")
+	http.Redirect(w, r, "/", 302)
+}
 
 //marcus
 func login() {}
@@ -330,6 +343,7 @@ func main() {
 	router.HandleFunc("/public", public_timeline).Name("public")
 	router.HandleFunc("/{username}/follow", follow_user)
 	router.HandleFunc("/{username}/unfollow", unfollow_user)
+	router.HandleFunc("/add_message", add_message).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
