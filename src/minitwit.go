@@ -438,6 +438,7 @@ func main() {
 	router.HandleFunc("/login", before_request(loginpage))
 	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
 	router.HandleFunc("/public", public_timeline)
+	handleApiRequest()
 	router.HandleFunc("/{username}", user_timeline)
 
 	router.HandleFunc("/{username}/follow", follow_user)
