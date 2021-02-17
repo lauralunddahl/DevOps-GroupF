@@ -22,3 +22,9 @@ func init() {
 func GetDB() *gorm.DB {
 	return DB
 }
+
+// func initialMigration() {
+// 	db.AutoMigrate(&User{})
+// 	db.AutoMigrate(&Message{})
+// 	db.AutoMigrate(&Follower{})
+// }
