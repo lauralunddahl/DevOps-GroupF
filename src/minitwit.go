@@ -164,7 +164,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			timelines = append(timelines, timeline)
 		}
 
-		templ := template.Must(template.ParseFiles("../templates/tmp.html", "../templates/layout.html"))
+		templ := template.Must(template.ParseFiles("./templates/tmp.html","./templates/layout.html"))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline": timelines,
@@ -178,7 +178,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 
 //marcus
 func loginpage(w http.ResponseWriter, r *http.Request) {
-	loginp, err := template.ParseFiles("../templates/login.html")
+	loginp, err := template.ParseFiles("./templates/login.html")
 	if err != nil {
 		println(err.Error())
 	}
@@ -220,6 +220,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func public_timeline(w http.ResponseWriter, r *http.Request) {
+
 	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?", strconv.Itoa(per_page))
 	defer rows.Close()
 	var timelines []Timeline
@@ -231,7 +232,7 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 		timelines = append(timelines, timeline)
 	}
 
-	templ := template.Must(template.ParseFiles("../templates/tmp.html", "../templates/layout.html"))
+	templ := template.Must(template.ParseFiles( "./templates/tmp.html","./templates/layout.html"))
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
@@ -281,7 +282,7 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 			timelines = append(timelines, timeline)
 		}
 
-		templ := template.Must(template.ParseFiles("../templates/tmp.html", "../templates/layout.html"))
+		templ := template.Must(template.ParseFiles("./templates/tmp.html", "./templates/layout.html"))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":    timelines,
@@ -368,7 +369,7 @@ func add_message(w http.ResponseWriter, r *http.Request) {
 
 //Nanna
 func register(w http.ResponseWriter, r *http.Request) {
-	register, err := template.ParseFiles("../templates/register.html")
+	register, err := template.ParseFiles("./templates/register.html")
 	if err != nil {
 		println(err.Error())
 	}
@@ -431,6 +432,8 @@ func checkErr(err error) {
 
 func main() {
 
+	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
+	
 	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/register", before_request(register))
 	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
