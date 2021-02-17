@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"fmt"
@@ -6,14 +6,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
-
-type User struct {
-	//gorm.Model
-	UserId   int
-	Username string
-	Email    string
-	PwHash   string
-}
 
 type Message struct {
 	//gorm.Model
@@ -24,7 +16,7 @@ type Message struct {
 	Flagged   int
 }
 
-func main() {
+func OpenDB() *gorm.DB {
 	db, err := gorm.Open("mysql", "groupf:f0psD3v1123@(localhost)/minitwit?charset=utf8&parseTime=True&loc=Local")
 	defer db.Close()
 	if err != nil {
@@ -32,21 +24,22 @@ func main() {
 		panic("Failed to connect to the database!")
 	}
 
-	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Message{})
 
-	var user []User
-	db.Find(&user)
-	fmt.Println("{}", user)
+	// var user []User
+	// db.Find(&user)
+	// fmt.Println("{}", user)
 
 	var message []Message
 	db.Find(&message)
 	fmt.Println("{}", message)
+
+	return db
 }
 
-func (User) TableName() string {
-	return "user"
-}
+// func (User) TableName() string {
+// 	return "user"
+// }
 
 func (Message) TableName() string {
 	return "message"
