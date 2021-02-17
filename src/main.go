@@ -1,8 +1,10 @@
 package main
 
-import "controller"
+import "dto"
 
 func main() {
-	user := controller.GetUserID("laulu")
-	println(user)
+	//user := dto.GetUserID("laulu")
+	dto.GetUsers()
+	timeline := dto.GetPrivateTimeline(1)
+	println(timeline)
 }

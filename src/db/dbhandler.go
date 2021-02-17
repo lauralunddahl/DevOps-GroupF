@@ -7,40 +7,18 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type Message struct {
-	//gorm.Model
-	MessageId int
-	AuthorId  int
-	Text      string
-	PubDate   int
-	Flagged   int
-}
+var DB *gorm.DB
 
-func OpenDB() *gorm.DB {
-	db, err := gorm.Open("mysql", "groupf:f0psD3v1123@(localhost)/minitwit?charset=utf8&parseTime=True&loc=Local")
-	defer db.Close()
+func init() {
+	database, err := gorm.Open("mysql", "groupf:f0psD3v1123@(localhost)/minitwit?charset=utf8&parseTime=True&loc=Local")
+	//defer db.Close()
 	if err != nil {
 		fmt.Println(err)
 		panic("Failed to connect to the database!")
 	}
-
-	db.AutoMigrate(&Message{})
-
-	// var user []User
-	// db.Find(&user)
-	// fmt.Println("{}", user)
-
-	var message []Message
-	db.Find(&message)
-	fmt.Println("{}", message)
-
-	return db
+	DB = database
 }
 
-// func (User) TableName() string {
-// 	return "user"
-// }
-
-func (Message) TableName() string {
-	return "message"
+func GetDB() *gorm.DB {
+	return DB
 }
