@@ -9,10 +9,6 @@ type User struct {
 	PwHash   string
 }
 
-func (User) TableName() string {
-	return "user"
-}
-
 func GetUserID(username string) int {
 	user := User{}
 	database.DB.Where("username = ?", username).First(&user)
