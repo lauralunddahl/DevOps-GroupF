@@ -10,12 +10,8 @@ type Message struct {
 	Flagged   int
 }
 
-func (Message) TableName() string {
-	return "message"
-}
-
 func AddMessage(author_id string, text string, pub_date int, flagged int) { //change pub_date to date at some point
-	message := Message{MessageId: "1", AuthorId: author_id, Text: text, PubDate: pub_date, Flagged: flagged}
+	message := Message{AuthorId: author_id, Text: text, PubDate: pub_date, Flagged: flagged}
 	result := database.DB.Create(&message)
 	if result.Error != nil {
 		print(result.Error)
