@@ -17,6 +17,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 	"tawesoft.co.uk/go/dialog"
+	api "api"
 )
 
 const database string = "../minitwit.db"
@@ -438,6 +439,7 @@ func main() {
 	router.HandleFunc("/login", before_request(loginpage))
 	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
 	router.HandleFunc("/public", public_timeline)
+	api.HandleApiRequest(router)
 	router.HandleFunc("/{username}", user_timeline)
 
 	router.HandleFunc("/{username}/follow", follow_user)
