@@ -1,0 +1,27 @@
+
+<!doctype html>
+<html>
+<title>Welcome | MiniTwit</title>
+<link rel="stylesheet" type="text/css"  href="../css/style.css">
+<div class="page">
+  <h1>MiniTwit</h1>
+  <div class="navigation">
+  {{ if .UserId}} <!-- we should properply make method to see if people are logged in -->
+    <a href="/">my timeline</a> 
+    <a href="/public">public timeline</a> 
+    <a href="/">sign out {{ .Username }}</a>  
+    {{ else }}
+    <a href="/public">public timeline</a> 
+    <a href="/register">sign up</a> 
+    <a href="/login">sign in</a> 
+  {{ end }}
+  </div>
+  <div class="body">
+    {{block "body" $}}
+    {{end}}
+  </div>
+  <div class="footer">
+    MiniTwit &mdash; A Go Application
+  </div>
+</div>
+</html>
