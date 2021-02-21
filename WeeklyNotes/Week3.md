@@ -24,7 +24,9 @@ go get github.com/go-sql-driver/mysql
 go get github.com/jinzhu/gorm
 
 Setup:
-export $GOPATH='[path to repo]'
-export $GOROOT=''
+```
+export GOPATH='[path to repo]'
+export GOROOT=''
+
 
 After having done this, you will have to go get all of the packages again that we have gotten so far. 
