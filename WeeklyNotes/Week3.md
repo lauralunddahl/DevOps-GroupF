@@ -30,3 +30,5 @@ export GOROOT=''
 ```
 
 After having done this, you will have to go get all of the packages again that we have gotten so far. 
+```
+Remember: Log choices of database, ORM framework and virtulizesation technique and deployment target. 
