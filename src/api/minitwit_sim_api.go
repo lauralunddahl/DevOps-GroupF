@@ -1,6 +1,7 @@
-package main
+package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,6 +12,27 @@ import (
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type Timeline struct {
+	Username string
+	UserId   int
+	Email    string
+	PwHash   string
+
+	MessageId int
+	AuthorId  int
+	Text      string
+	PubDate   int
+	Flagged   int
+}
+
+type Message struct {
+	MessageId string
+	AuthorId  string
+	Text      string
+	PubDate   string
+	Flagged   int
+}
 
 type Latest struct {
 	La string `json:"latest"`
@@ -43,6 +65,61 @@ type FollowUser struct {
 }
 
 var latest = 0
+var DB *sql.DB = connect_db()
+
+const database string = "../minitwit.db"
+
+func connect_db() (DB *sql.DB) {
+	db, err := sql.Open("sqlite3", database)
+	checkErr(err)
+	return db
+}
+
+func query_db(query string, arg string) *sql.Rows {
+	stmt, err := DB.Prepare(query)
+	checkErr(err)
+	defer stmt.Close()
+	rows, err := stmt.Query(arg)
+	checkErr(err)
+	return rows
+}
+
+func query_db_multiple2(query string, arg1 string, arg2 string) *sql.Rows {
+	stmt, err := DB.Prepare(query)
+	checkErr(err)
+	defer stmt.Close()
+	rows, err := stmt.Query(arg1, arg2)
+	checkErr(err)
+	return rows
+}
+
+func query_db_multiple3(query string, arg1 string, arg2 string, arg3 string) *sql.Rows {
+	stmt, err := DB.Prepare(query)
+	checkErr(err)
+	defer stmt.Close()
+	rows, err := stmt.Query(arg1, arg2, arg3)
+	checkErr(err)
+	return rows
+}
+
+func get_user_id(username string) int {
+	rows := query_db("SELECT user_id from user where username = ?", username)
+	defer rows.Close()
+
+	var uid int
+
+	for rows.Next() {
+		err := rows.Scan(&uid)
+		checkErr(err)
+	}
+	return uid
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
 
 func not_req_from_simulator(w http.ResponseWriter, r *http.Request) {
 	fromSim := r.Header.Get("Authorization")
