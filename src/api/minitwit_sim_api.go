@@ -1,13 +1,15 @@
 package api
 
 import (
-	"database/sql"
+	"dto"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
@@ -22,7 +24,7 @@ type Timeline struct {
 	MessageId int
 	AuthorId  int
 	Text      string
-	PubDate   int
+	PubDate   time.Time
 	Flagged   int
 }
 
@@ -30,7 +32,7 @@ type Message struct {
 	MessageId string
 	AuthorId  string
 	Text      string
-	PubDate   string
+	PubDate   time.Time
 	Flagged   int
 }
 
@@ -44,9 +46,9 @@ type Response struct {
 }
 
 type ApiMessage struct {
-	Content string `json:"content"`
-	PubDate string `json:"pub_date"`
-	User    string `json:"user"`
+	Content string    `json:"content"`
+	PubDate time.Time `json:"pub_date"`
+	User    string    `json:"user"`
 }
 
 type Register struct {
@@ -65,55 +67,6 @@ type FollowUser struct {
 }
 
 var latest = 0
-var DB *sql.DB = connect_db()
-
-const database string = "../minitwit.db"
-
-func connect_db() (DB *sql.DB) {
-	db, err := sql.Open("sqlite3", database)
-	checkErr(err)
-	return db
-}
-
-func query_db(query string, arg string) *sql.Rows {
-	stmt, err := DB.Prepare(query)
-	checkErr(err)
-	defer stmt.Close()
-	rows, err := stmt.Query(arg)
-	checkErr(err)
-	return rows
-}
-
-func query_db_multiple2(query string, arg1 string, arg2 string) *sql.Rows {
-	stmt, err := DB.Prepare(query)
-	checkErr(err)
-	defer stmt.Close()
-	rows, err := stmt.Query(arg1, arg2)
-	checkErr(err)
-	return rows
-}
-
-func query_db_multiple3(query string, arg1 string, arg2 string, arg3 string) *sql.Rows {
-	stmt, err := DB.Prepare(query)
-	checkErr(err)
-	defer stmt.Close()
-	rows, err := stmt.Query(arg1, arg2, arg3)
-	checkErr(err)
-	return rows
-}
-
-func get_user_id(username string) int {
-	rows := query_db("SELECT user_id from user where username = ?", username)
-	defer rows.Close()
-
-	var uid int
-
-	for rows.Next() {
-		err := rows.Scan(&uid)
-		checkErr(err)
-	}
-	return uid
-}
 
 func checkErr(err error) {
 	if err != nil {
@@ -160,14 +113,14 @@ func apiRegister(w http.ResponseWriter, r *http.Request) {
 		err += "You have to enter a password\n"
 	} else if newReg.Password != newReg.Password2 {
 		err += "The two passwords do not match\n"
-	} else if get_user_id(newReg.Username) > 0 { //this might have to be another check at some point
+	} else if dto.GetUserID(newReg.Username) > 0 { //this might have to be another check at some point
 		err += "The username is already taken"
 	} else {
 		pw_hash, err := bcrypt.GenerateFromPassword([]byte(newReg.Password), bcrypt.MinCost)
 		if err != nil {
 			println(err.Error())
 		}
-		query_db_multiple3("insert into user (username, email, pw_hash) values (?, ?, ?)", newReg.Username, newReg.Email, string(pw_hash))
+		dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash))
 		fmt.Println(w, "You were successfully registered and can login now")
 	}
 	if err != "" {
@@ -194,20 +147,12 @@ func messages(w http.ResponseWriter, r *http.Request) {
 	if no_msg == "" {
 		no_msg = "100"
 	}
-	rows := query_db("select user.*, message.*  from message, user where message.flagged = 0 and message.author_id = user.user_id order by message.pub_date desc limit ?", no_msg)
-	var timelines []Timeline
-	var timeline Timeline
-	for rows.Next() {
-		err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
-			&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
-		checkErr(err)
-		timelines = append(timelines, timeline)
-	}
+	var timelines = dto.GetPublicTimeline() //update to no_msg
 	var messages []ApiMessage
 	for _, t := range timelines {
 		var message ApiMessage
 		message.Content = t.Text
-		message.PubDate = strconv.Itoa(t.PubDate)
+		message.PubDate = t.PubDate
 		message.User = t.Username
 		messages = append(messages, message)
 	}
@@ -229,41 +174,30 @@ func messages_per_user(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		user_id := get_user_id(username)
+		user_id := dto.GetUserID(username)
 		if user_id == 0 {
 			var res Response
 			res.Status = 500
 			res.ErrorMsg = "No user found"
 			json.NewEncoder(w).Encode(res)
 		} else {
-			rows := query_db_multiple2("select user.*, message.* from message, user where user.user_id = message.author_id and user.user_id = ? order by message.pub_date desc limit ?", strconv.Itoa(user_id), no_msg)
-			var timelines []Timeline
-			var timeline Timeline
-			for rows.Next() {
-				err := rows.Scan(&timeline.UserId, &timeline.Username, &timeline.Email, &timeline.PwHash,
-					&timeline.MessageId, &timeline.AuthorId, &timeline.Text, &timeline.PubDate, &timeline.Flagged)
-				checkErr(err)
-				timelines = append(timelines, timeline)
-			}
+			var timelines = dto.GetUserTimeline(user_id) //update to no_msg
 			var messages []ApiMessage
 			for _, t := range timelines {
 				var message ApiMessage
 				message.Content = t.Text
-				message.PubDate = strconv.Itoa(t.PubDate)
+				message.PubDate = t.PubDate
 				message.User = t.Username
 				messages = append(messages, message)
 			}
 			json.NewEncoder(w).Encode(messages)
 		}
 	case "POST":
+		user_id := dto.GetUserID(username)
 		w.Header().Set("Content-Type", "application/json")
 		var message Message
 		json.NewDecoder(r.Body).Decode(&message)
-		stmt, _ := DB.Prepare("insert into message (author_id, text, pub_date, flagged) values (?, ?, ?, 0)")
-		_, err := stmt.Exec(get_user_id(username), message.Text, time.Now().Format("1612171952"))
-		if err != nil {
-			println(err.Error())
-		}
+		dto.AddMessage(strconv.Itoa(user_id), message.Text, time.Now(), 0)
 		var res Response
 		res.Status = 204
 		res.ErrorMsg = ""
@@ -284,7 +218,7 @@ func follow(w http.ResponseWriter, r *http.Request) {
 		no_followers = "100"
 	}
 
-	user_id := get_user_id(username)
+	user_id := dto.GetUserID(username)
 	if user_id == 0 {
 		var res Response
 		res.Status = 404
@@ -300,18 +234,14 @@ func follow(w http.ResponseWriter, r *http.Request) {
 		json.NewDecoder(r.Body).Decode(&follows)
 		if len(follows.Follow) > 0 {
 			follows_username := follows.Follow
-			follows_user_id := get_user_id(follows_username)
+			follows_user_id := dto.GetUserID(follows_username)
 			if follows_user_id == 0 {
 				var res Response
 				res.Status = 500
 				res.ErrorMsg = "No user found"
 				json.NewEncoder(w).Encode(res)
 			} else {
-				stmt, _ := DB.Prepare("insert into follower (who_id, whom_id) values (?, ?)")
-				_, err := stmt.Exec(user_id, follows_user_id)
-				if err != nil {
-					println(err.Error())
-				}
+				dto.FollowUser(user_id, follows_user_id)
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
@@ -319,18 +249,14 @@ func follow(w http.ResponseWriter, r *http.Request) {
 			}
 		} else if len(follows.Unfollow) > 0 {
 			unfollows_username := follows.Unfollow
-			unfollows_user_id := get_user_id(unfollows_username)
+			unfollows_user_id := dto.GetUserID(unfollows_username)
 			if user_id == 0 {
 				var res Response
 				res.Status = 500
 				res.ErrorMsg = "No user found"
 				json.NewEncoder(w).Encode(res)
 			} else {
-				stmt, _ := DB.Prepare("delete from follower where who_id=? and whom_id=?")
-				_, err := stmt.Exec(user_id, unfollows_user_id)
-				if err != nil {
-					println(err.Error())
-				}
+				dto.UnfollowUser(user_id, unfollows_user_id)
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
@@ -338,17 +264,8 @@ func follow(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	case "GET":
-		rows := query_db_multiple2("select user.username from user inner join follower on follower.whom_id=user.user_id where follower.who_id = ? limit ?", strconv.Itoa(user_id), no_followers)
-		defer rows.Close()
-		var followers []Followers
-		var follower Followers
-		for rows.Next() {
-			err := rows.Scan(&follower.Username)
-			if err != nil {
-				println(err.Error())
-			}
-			followers = append(followers, follower)
-		}
+		numb, _ := strconv.Atoi(no_followers)
+		var followers = dto.GetFollowers(user_id, numb)
 		json.NewEncoder(w).Encode(followers)
 	}
 }

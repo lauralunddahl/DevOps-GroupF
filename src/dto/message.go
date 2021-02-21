@@ -1,16 +1,19 @@
 package dto
 
-import database "db"
+import (
+	database "db"
+	"time"
+)
 
 type Message struct {
 	MessageId string
 	AuthorId  string
 	Text      string
-	PubDate   int
+	PubDate   time.Time
 	Flagged   int
 }
 
-func AddMessage(author_id string, text string, pub_date int, flagged int) { //change pub_date to date at some point
+func AddMessage(author_id string, text string, pub_date time.Time, flagged int) { //change pub_date to date at some point
 	message := Message{AuthorId: author_id, Text: text, PubDate: pub_date, Flagged: flagged}
 	result := database.DB.Create(&message)
 	if result.Error != nil {
