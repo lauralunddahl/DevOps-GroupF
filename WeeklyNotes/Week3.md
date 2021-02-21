@@ -27,6 +27,6 @@ Setup:
 ```
 export GOPATH='[path to repo]'
 export GOROOT=''
-
+```
 
 After having done this, you will have to go get all of the packages again that we have gotten so far. 
