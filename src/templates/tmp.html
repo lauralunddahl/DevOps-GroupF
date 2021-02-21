@@ -1,21 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<link rel="stylesheet" type="text/css"  href="../css/style.css">
-
-
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Timeline</title>
-
-</head>
-<body>
-    {{block "layout" $}} {{end}}
-
-<h2>Timeline</h2>
-
+{{define "body"}}
+<h2> {{if eq "public" (.type)}}
+    Public Timeline
+  {{ else if eq "user" (.type) }}
+    {{ .Username }}'s Timeline
+  {{ else }}
+    My Timeline
+  {{ end }}</h2>
+  {{ if .profileuser }}
+    {{ if eq "user" .type }}
+      <div class=followstatus>
+      {{ if eq  .sess_u_id .profileuser.userId }}
+        This is you!
+      {{ else if .followed }}
+        You are currently following this user.
+        <a class=unfollow href="/{{.profileuser.username}}/unfollow
+          ">Unfollow user</a>.
+      {{else }}
+        You are not yet following this user.
+        <a class=follow href="/{{.profileuser.username}}/follow">Follow user</a>.
+      {{ end}}
+      </div>
+    {{else if eq "default" .type }}
+      <div class=twitbox>
+        <h3>What's on your mind {{ .timeline.username }}?</h3>
+        <form action="/add_message" method=post>
+          <p><input type=text name=text size=60><!--
+          --><input type=submit value="Share">
+        </form>
+      </div>
+    {{end}}
+  {{end}}
+    <div class=twitbox>
+        <h3>What's on your mind?</h3>
+        <form method=post>
+          <p><input type=text name=text size=60>
+            <input type=submit value="Share">
+        </form>
+      </div>
     <ul class=messages>
     {{if eq 0 (len .timeline)}}
         <li><em>There's no message so far.</em></li>
@@ -31,7 +52,4 @@
           {{end}}
     {{end}}
 </ul>
-
-</body>
-
-</html>
+{{end}}

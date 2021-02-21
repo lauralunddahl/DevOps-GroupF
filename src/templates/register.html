@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
-
-</head>
-<body>
+{{define "body"}}
 <h2>Sign Up</h2>
-  <div class=error><strong>Error:</strong></div>
-  <form action="" method=post>
+
+  {{if .error}}
+    <div class=error><strong>Error:</strong>{{ .error }}</div>
+  {{ end }}
+  
+  <form action="/registerfunc" method=post>
     <dl>
       <dt>Username:
-      <dd><input type=text name=username size=30 value="">
+      <dd><input type=text name=username size=30 >
       <dt>E-Mail:
-      <dd><input type=text name=email size=30 value="">
+      <dd><input type=text name=email size=30>
       <dt>Password:
       <dd><input type=password name=password size=30>
       <dt>Password <small>(repeat)</small>:
@@ -24,3 +20,4 @@
   </form>
 </body>
 </html>
+{{end}}

@@ -1,4 +1,4 @@
-{{define "layout" }}
+
 <!doctype html>
 <html>
 <title>Welcome | MiniTwit</title>
@@ -17,10 +17,11 @@
   {{ end }}
   </div>
   <div class="body">
+    {{block "body" $}}
+    {{end}}
   </div>
   <div class="footer">
     MiniTwit &mdash; A Go Application
   </div>
 </div>
 </html>
-{{end}}

@@ -164,11 +164,13 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			timelines = append(timelines, timeline)
 		}
 
-		templ := template.Must(template.ParseFiles("./templates/tmp.html","./templates/layout.html"))
+		templ := template.Must(template.ParseFiles("./templates/layout.html","./templates/tmp.html"))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline": timelines,
 			"public":   false,
+			"type": "default",
+			"sess_u_id":   user_id,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -178,7 +180,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 
 //marcus
 func loginpage(w http.ResponseWriter, r *http.Request) {
-	loginp, err := template.ParseFiles("./templates/login.html")
+	loginp, err := template.ParseFiles("./templates/layout.html","./templates/login.html")
 	if err != nil {
 		println(err.Error())
 	}
@@ -232,11 +234,13 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 		timelines = append(timelines, timeline)
 	}
 
-	templ := template.Must(template.ParseFiles( "./templates/tmp.html","./templates/layout.html"))
+	//templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
+	templ := template.Must(template.ParseFiles("./templates/layout.html","./templates/tmp.html"))
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
 		"public":   true,
+		"type": "public",
 	})
 	if err != nil {
 		fmt.Fprintln(w, err)
@@ -289,6 +293,8 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 			"public":      false,
 			"profileuser": profileuser,
 			"followed":    followed,
+			"type": 	   "user",
+			"sess_u_id":   user_id,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -369,7 +375,7 @@ func add_message(w http.ResponseWriter, r *http.Request) {
 
 //Nanna
 func register(w http.ResponseWriter, r *http.Request) {
-	register, err := template.ParseFiles("./templates/register.html")
+	register, err := template.ParseFiles("./templates/layout.html","./templates/register.html")
 	if err != nil {
 		println(err.Error())
 	}
@@ -391,10 +397,11 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	password2 := r.FormValue("password2")
+
 	if len(username) == 0 {
 		err = "You have to enter a username\n"
-	} else if len(email) == 0 || strings.Contains(email, "@") {
-		err += "You have to enter a vlid email address\n"
+	} else if len(email) == 0 || !strings.Contains(email, "@") {
+		err += "You have to enter a valid email address\n"
 	} else if len(password) == 0 {
 		err += "You have to enter a password\n"
 	} else if password != password2 {
@@ -410,6 +417,20 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(w, "You were successfully registered and can login now")
 		http.Redirect(w, r, "/login", 302)
 	}
+
+	register, err2 := template.ParseFiles("./templates/layout.html","./templates/register.html")
+	if err2 != nil {
+		println(err2.Error())
+	}
+	
+	
+	e := register.Execute(w, map[string]interface{}{
+		"error": err,
+	})
+	if e != nil {
+		fmt.Fprintln(w, err)
+	}
+
 }
 
 //Louise
