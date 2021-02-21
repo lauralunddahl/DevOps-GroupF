@@ -3,6 +3,7 @@ package dto
 import (
 	database "db"
 	"strconv"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -16,7 +17,7 @@ type Timeline struct {
 	MessageId int
 	AuthorId  int
 	Text      string
-	PubDate   int
+	PubDate   time.Time
 	Flagged   int
 }
 

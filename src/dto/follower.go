@@ -26,6 +26,12 @@ func getFollower(who_id int, whom_id int) Follower {
 	return follower
 }
 
+func GetFollowers(who_id int, limit int) []Follower {
+	var followers []Follower
+	database.DB.Table("followers").Where("who_id = ?", who_id).Limit(limit).Scan(&followers)
+	return followers
+}
+
 func UnfollowUser(who_id int, whom_id int) {
 	follower := getFollower(who_id, whom_id)
 	result := database.DB.Delete(&follower)
