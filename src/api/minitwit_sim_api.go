@@ -271,9 +271,8 @@ func follow(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleApiRequest(router *mux.Router) {
-	router.HandleFunc("/api/test", not_req_from_simulator)
 	router.HandleFunc("/latest", get_latest).Methods("GET")
-	router.HandleFunc("/api/register", apiRegister).Methods("POST")
+	router.HandleFunc("/register", apiRegister).Methods("POST")
 	router.HandleFunc("/msgs", messages).Methods("GET")
 	router.HandleFunc("/fllws/{username}", follow).Methods("GET", "POST")
 	router.HandleFunc("/msgs/{username}", messages_per_user).Methods("GET", "POST")

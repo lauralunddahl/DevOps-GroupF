@@ -345,7 +345,7 @@ func main() {
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
 	router.HandleFunc("/", before_request(timeline))
-	router.HandleFunc("/register", before_request(register))
+	router.HandleFunc("/register", before_request(register)).Methods("GET")
 	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
 	router.HandleFunc("/", before_request(timeline))
 	router.HandleFunc("/login", before_request(loginpage))
