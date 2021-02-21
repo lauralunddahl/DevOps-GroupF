@@ -353,7 +353,7 @@ func follow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleApiRequest(router *mux.Router) {
+func HandleApiRequest(router *mux.Router) {
 	router.HandleFunc("/api/test", not_req_from_simulator)
 	router.HandleFunc("/latest", get_latest).Methods("GET")
 	router.HandleFunc("/api/register", apiRegister).Methods("POST")
