@@ -1,8 +1,9 @@
 package dto
 
 import (
-	database "db"
 	"time"
+
+	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
 )
 
 type Message struct {

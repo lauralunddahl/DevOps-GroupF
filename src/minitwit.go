@@ -1,9 +1,7 @@
 package main
 
 import (
-	"api"
 	"crypto/sha1"
-	"dto"
 	"encoding/hex"
 	"fmt"
 	"html/template"
@@ -12,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	api "github.com/lauralunddahl/DevOps-GroupF/src/api"
+	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"dto"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
