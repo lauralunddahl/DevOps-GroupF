@@ -1,4 +1,4 @@
-module github.com/lauralunddahl/DevOps-GroupF
+module github.com/lauralunddahl/DevOps-GroupF/src
 
 go 1.13
 
