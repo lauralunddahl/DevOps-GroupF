@@ -30,5 +30,15 @@ export GOROOT=''
 ```
 
 After having done this, you will have to go get all of the packages again that we have gotten so far. 
-```
+
 Remember: Log choices of database, ORM framework and virtulizesation technique and deployment target. 
+
+We are no longer in need of the GOPATH as we have created a go.mod file, where all packages that have been "go get". 
+
+### Deployment
+- ssh into the droplet
+- cd into DevOps-GroupF
+- branch master
+- pull latest changes
+- run: docker-compose --compatibility up --build
+- tweet away
