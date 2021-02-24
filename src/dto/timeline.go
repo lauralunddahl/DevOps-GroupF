@@ -1,9 +1,10 @@
 package dto
 
 import (
-	database "db"
 	"strconv"
 	"time"
+
+	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
 
 	"github.com/jinzhu/gorm"
 )

@@ -1,6 +1,6 @@
 package dto
 
-import database "db"
+import database "github.com/lauralunddahl/DevOps-GroupF/src/db"
 
 type User struct {
 	UserId   int
