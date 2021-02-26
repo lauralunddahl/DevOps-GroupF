@@ -101,6 +101,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 	} else {
 		user_id := session.Values["userid"].(int)
 		var timelines = dto.GetPrivateTimeline(user_id)
+		println(user_id)
 
 		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
 
@@ -109,6 +110,8 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			"public":    false,
 			"type":      "default",
 			"sess_u_id": user_id,
+			"username":  dto.GetUsername(user_id),
+			"loggedin":  true,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -174,7 +177,7 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session1")
 
 	//session.Values["authenticated"] = false
-	println(session.Values["authenticated"].(bool))
+	//println(session.Values["authenticated"].(bool))
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		user_id = session.Values["userid"].(int)
 	}
@@ -345,11 +348,11 @@ func main() {
 
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
-	router.HandleFunc("/", before_request(timeline))
+	router.HandleFunc("/", timeline)
 	router.HandleFunc("/register", before_request(register)).Methods("GET")
 	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
 	router.HandleFunc("/", before_request(timeline))
-	router.HandleFunc("/login", before_request(loginpage))
+	router.HandleFunc("/login", loginpage)
 	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
 	router.HandleFunc("/public", public_timeline)
 	api.HandleApiRequest(router)
