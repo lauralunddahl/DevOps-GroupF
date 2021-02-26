@@ -81,7 +81,7 @@ func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, _ := store.Get(r, "session1")
 		session.Values["authenticated"] = false
-		session.Values["userid"] = 0
+		session.Values["userId"] = 0
 		err := session.Save(r, w)
 		if err != nil {
 			println(err.Error())
@@ -99,9 +99,8 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		http.Redirect(w, r, "/public", 302)
 	} else {
-		user_id := session.Values["userid"].(int)
+		user_id := session.Values["userId"].(int)
 		var timelines = dto.GetPrivateTimeline(user_id)
-		println(user_id)
 
 		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
 
@@ -109,9 +108,9 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			"timeline":  timelines,
 			"public":    false,
 			"type":      "default",
+			"loggedin":  true,
 			"sess_u_id": user_id,
 			"username":  dto.GetUsername(user_id),
-			"loggedin":  true,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -154,6 +153,20 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 302)
 }
 
+func userLoggedin(r *http.Request) bool {
+	var userLoggedin = false
+	session, _ := store.Get(r, "session1")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		userLoggedin = false
+	} else {
+		user_id := session.Values["userId"].(int)
+		if user_id != 0 {
+			userLoggedin = true
+		}
+	}
+	return userLoggedin
+}
+
 func public_timeline(w http.ResponseWriter, r *http.Request) {
 	var timelines = dto.GetPublicTimeline()
 	templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
@@ -162,6 +175,7 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 		"timeline": timelines,
 		"public":   true,
 		"type":     "public",
+		"loggedin": userLoggedin(r),
 	})
 	if err != nil {
 		fmt.Fprintln(w, err)
@@ -179,7 +193,7 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 	//session.Values["authenticated"] = false
 	//println(session.Values["authenticated"].(bool))
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userid"].(int)
+		user_id = session.Values["userId"].(int)
 	}
 	profileuser := dto.GetUser(username)
 
@@ -193,10 +207,12 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":    timelines,
 			"public":      false,
+			"loggedin":    userLoggedin(r),
 			"profileuser": profileuser,
 			"followed":    followed,
-			"type":        "user",
+			"visiting":    true,
 			"sess_u_id":   user_id,
+			"user":        username == profileuser.Username,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -215,7 +231,7 @@ func follow_user(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userid"].(int)
+		user_id = session.Values["userId"].(int)
 	}
 	if user_id == 0 {
 		http.Error(w, "not authorized", 401)
@@ -238,7 +254,7 @@ func unfollow_user(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userid"].(int)
+		user_id = session.Values["userId"].(int)
 	}
 	if user_id == 0 {
 		http.Error(w, "not authorized", 401)
@@ -254,10 +270,12 @@ func unfollow_user(w http.ResponseWriter, r *http.Request) {
 }
 
 func add_message(w http.ResponseWriter, r *http.Request) {
+	println("her")
 	user_id := 0
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userid"].(int)
+		user_id = session.Values["userId"].(int)
+		println(user_id)
 	}
 	if user_id == 0 {
 		http.Error(w, "not authorized", 401)
@@ -348,20 +366,20 @@ func main() {
 
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
-	router.HandleFunc("/", timeline)
+	router.HandleFunc("/", timeline).Methods("GET")
 	router.HandleFunc("/register", before_request(register)).Methods("GET")
 	router.HandleFunc("/registerfunc", handleRegister).Methods("POST")
-	router.HandleFunc("/", before_request(timeline))
-	router.HandleFunc("/login", loginpage)
+	router.HandleFunc("/", before_request(timeline)).Methods("GET")
+	router.HandleFunc("/login", before_request(loginpage))
 	router.HandleFunc("/loginfunc", handleLogin).Methods("POST")
 	router.HandleFunc("/public", public_timeline)
-	api.HandleApiRequest(router)
-	router.HandleFunc("/{username}", user_timeline)
-
-	router.HandleFunc("/{username}/follow", follow_user)
-	router.HandleFunc("/{username}/unfollow", unfollow_user)
 	router.HandleFunc("/add_message", add_message).Methods("POST")
 	router.HandleFunc("/logout", logout)
+	router.HandleFunc("/{username}", user_timeline).Methods("GET")
+	router.HandleFunc("/{username}/follow", follow_user)
+	router.HandleFunc("/{username}/unfollow", unfollow_user)
+
+	api.HandleApiRequest(router)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

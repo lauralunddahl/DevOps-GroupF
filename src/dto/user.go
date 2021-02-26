@@ -17,14 +17,14 @@ func GetUserID(username string) int {
 
 func GetUser(username string) User {
 	user := User{}
-	database.DB.Select("username").Where("username = ?", username).First(&user)
+	database.DB.Where("username = ?", username).First(&user)
 	return user
 }
 
-func GetUsername(userid int) User {
+func GetUsername(userid int) string {
 	user := User{}
 	database.DB.Where("user_id = ?", userid).First(&user)
-	return user
+	return user.Username
 }
 
 func RegisterUser(username string, email string, password string) {
