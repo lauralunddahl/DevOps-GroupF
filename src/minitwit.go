@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"fmt"
 	"html/template"
 	"log"
@@ -13,6 +11,7 @@ import (
 
 	api "github.com/lauralunddahl/DevOps-GroupF/src/api"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
+	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -39,6 +38,7 @@ type User struct {
 	UserId   string
 	Email    string
 	PwHash   string
+	Image    string
 }
 
 type Message struct {
@@ -54,6 +54,7 @@ type Timeline struct {
 	UserId   int
 	Email    string
 	PwHash   string
+	Image    string
 
 	MessageId int
 	AuthorId  int
@@ -67,14 +68,6 @@ func format_datetime(timestamp string) string {
 	t, err := time.Parse(layout, timestamp)
 	checkErr(err)
 	return t.String()
-}
-
-func gravatar_url(email string) string {
-	size := 40
-	h := sha1.New()
-	h.Write([]byte(strings.ToLower(strings.TrimSpace(email))))
-	sha1_hash := hex.EncodeToString(h.Sum(nil))
-	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", sha1_hash, size)
 }
 
 func before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +96,6 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		var timelines = dto.GetPrivateTimeline(user_id)
 
 		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
-		//image := gravatar_url(dto.GetUserById(user_id).Email)
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":  timelines,
 			"public":    false,
@@ -111,7 +103,6 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			"loggedin":  true,
 			"sess_u_id": user_id,
 			"username":  dto.GetUsername(user_id),
-			//"image":     image,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -328,10 +319,12 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		pw_hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 		if err != nil {
 			println(err.Error())
+		} else {
+			image := helper.Gravatar_url(email)
+			dto.RegisterUser(username, email, string(pw_hash), image)
+			fmt.Println(w, "You were successfully registered and can login now")
+			http.Redirect(w, r, "/login", 302)
 		}
-		dto.RegisterUser(username, email, string(pw_hash))
-		fmt.Println(w, "You were successfully registered and can login now")
-		http.Redirect(w, r, "/login", 302)
 	}
 
 	register, err2 := template.ParseFiles("./templates/layout.html", "./templates/register.html")
@@ -345,7 +338,6 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		fmt.Fprintln(w, err)
 	}
-
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -366,7 +358,6 @@ func checkErr(err error) {
 }
 
 func main() {
-
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
 	router.HandleFunc("/", timeline).Methods("GET")

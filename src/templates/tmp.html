@@ -36,7 +36,7 @@
         <li><em>There's no message so far.</em></li>
     {{else}}
           {{ range .timeline }}
-          <li><img alt="picture"><p> <!--.image-->
+          <li><img src="{{.Image}}"alt="picture"><p> <!--.image-->
           <!--TODO: figure out how to call "gravatar_url" with email-->
             <strong><a href="/{{.Username}}">{{ .Username }}</a></strong>
             {{.Text}}
