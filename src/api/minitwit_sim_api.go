@@ -53,8 +53,8 @@ type ApiMessage struct {
 type Register struct {
 	Username  string `json:"username"`
 	Email     string `json:"email" `
-	Password  string `json:"password"`
-	Password2 string `json:"password2"`
+	Password  string `json:"pwd"`
+	
 }
 
 type Followers struct {
@@ -99,7 +99,6 @@ func get_latest(w http.ResponseWriter, r *http.Request) {
 
 func apiRegister(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
-	w.Header().Set("Content-Type", "application/json")
 	err := ""
 	var newReg Register
 	json.NewDecoder(r.Body).Decode(&newReg)
@@ -110,35 +109,34 @@ func apiRegister(w http.ResponseWriter, r *http.Request) {
 		err += "You have to enter a valid email address\n"
 	} else if len(newReg.Password) == 0 {
 		err += "You have to enter a password\n"
-	} else if newReg.Password != newReg.Password2 {
-		err += "The two passwords do not match\n"
 	} else if dto.GetUserID(newReg.Username) > 0 { //this might have to be another check at some point
 		err += "The username is already taken"
+	}
+	var res Response
+	if err != "" {
+		println(err)
+		res.Status = 400
+		res.ErrorMsg = err	
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	} else {
 		pw_hash, err := bcrypt.GenerateFromPassword([]byte(newReg.Password), bcrypt.MinCost)
 		if err != nil {
 			println(err.Error())
+		} else{
+			dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash))
+			fmt.Println(w, "You were successfully registered and can login now")
+			res.Status = 204
+			res.ErrorMsg = ""
+			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		}
-		dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash))
-		fmt.Println(w, "You were successfully registered and can login now")
 	}
-	if err != "" {
-		var res Response
-		res.Status = 400
-		res.ErrorMsg = err
-		json.NewEncoder(w).Encode(res)
-		return
-	} else {
-		var res Response
-		res.Status = 204
-		res.ErrorMsg = ""
-		json.NewEncoder(w).Encode(res)
-		return
-	}
+	json.NewEncoder(w).Encode(res)
+	
 }
 
 func messages(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
+	println("msgs!!!")
 
 	//not_req_from_simulator(w, r)
 
@@ -160,7 +158,6 @@ func messages(w http.ResponseWriter, r *http.Request) {
 
 func messages_per_user(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
-
 	vars := mux.Vars(r)
 	username := vars["username"]
 
@@ -193,13 +190,13 @@ func messages_per_user(w http.ResponseWriter, r *http.Request) {
 		}
 	case "POST":
 		user_id := dto.GetUserID(username)
-		w.Header().Set("Content-Type", "application/json")
-		var message Message
+		var message ApiMessage
 		json.NewDecoder(r.Body).Decode(&message)
-		dto.AddMessage(strconv.Itoa(user_id), message.Text, time.Now(), 0)
+		dto.AddMessage(strconv.Itoa(user_id), message.Content, time.Now(), 0)
 		var res Response
 		res.Status = 204
 		res.ErrorMsg = ""
+		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		json.NewEncoder(w).Encode(res)
 
 	}
@@ -222,6 +219,7 @@ func follow(w http.ResponseWriter, r *http.Request) {
 		var res Response
 		res.Status = 404
 		res.ErrorMsg = "No user found"
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		json.NewEncoder(w).Encode(res)
 	}
 
@@ -236,14 +234,16 @@ func follow(w http.ResponseWriter, r *http.Request) {
 			follows_user_id := dto.GetUserID(follows_username)
 			if follows_user_id == 0 {
 				var res Response
-				res.Status = 500
+				res.Status = 404
 				res.ErrorMsg = "No user found"
+				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
 			} else {
 				dto.FollowUser(user_id, follows_user_id)
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
+				http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 				json.NewEncoder(w).Encode(res)
 			}
 		} else if len(follows.Unfollow) > 0 {
@@ -251,14 +251,16 @@ func follow(w http.ResponseWriter, r *http.Request) {
 			unfollows_user_id := dto.GetUserID(unfollows_username)
 			if user_id == 0 {
 				var res Response
-				res.Status = 500
+				res.Status = 404
 				res.ErrorMsg = "No user found"
+				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
 			} else {
 				dto.UnfollowUser(user_id, unfollows_user_id)
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
+				http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 				json.NewEncoder(w).Encode(res)
 			}
 		}
