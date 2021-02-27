@@ -3,14 +3,14 @@
 <h2> {{if eq "public" (.type)}}
     Public Timeline
   {{ else if eq "user" (.type) }}
-    {{ .Username }}'s Timeline
+    {{ .profileuser.Username }}'s Timeline
   {{ else }}
     My Timeline
   {{ end }}</h2>
   {{ if .loggedin }}
       {{ if .visiting }}
         <div class=followstatus>
-        {{ if .user }}
+        {{ if .loggedinuser }}
           This is you!
         {{ else if .followed }}
           You are currently following this user.
@@ -36,14 +36,15 @@
         <li><em>There's no message so far.</em></li>
     {{else}}
           {{ range .timeline }}
+          <li><img alt="picture"><p> <!--.image-->
           <!--TODO: figure out how to call "gravatar_url" with email-->
-          <li><img src=""><p>
             <strong><a href="/{{.Username}}">{{ .Username }}</a></strong>
             {{.Text}}
             <!--TODO: figure out how to call "format_datetime" with the pubdate-->
             <small>&mdash; {{ .PubDate }}</small> 
           </li>
           {{end}}
+
     </div>
     {{end}}
   </ul>  
