@@ -7,6 +7,7 @@ type User struct {
 	Username string
 	Email    string
 	PwHash   string
+	Image    string
 }
 
 func GetUserID(username string) int {
@@ -33,8 +34,8 @@ func GetUsername(userid int) string {
 	return user.Username
 }
 
-func RegisterUser(username string, email string, password string) {
-	user := User{Username: username, Email: email, PwHash: password}
+func RegisterUser(username string, email string, password string, image string) {
+	user := User{Username: username, Email: email, PwHash: password, Image: image}
 	result := database.DB.Create(&user)
 	if result.Error != nil {
 		print(result.Error)
