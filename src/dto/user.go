@@ -21,6 +21,12 @@ func GetUser(username string) User {
 	return user
 }
 
+func GetUserById(user_id int) User {
+	user := User{}
+	database.DB.Where("user_id = ?", user_id).First(&user)
+	return user
+}
+
 func GetUsername(userid int) string {
 	user := User{}
 	database.DB.Where("user_id = ?", userid).First(&user)

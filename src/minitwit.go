@@ -70,7 +70,7 @@ func format_datetime(timestamp string) string {
 }
 
 func gravatar_url(email string) string {
-	size := 80
+	size := 40
 	h := sha1.New()
 	h.Write([]byte(strings.ToLower(strings.TrimSpace(email))))
 	sha1_hash := hex.EncodeToString(h.Sum(nil))
@@ -103,7 +103,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 		var timelines = dto.GetPrivateTimeline(user_id)
 
 		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
-
+		//image := gravatar_url(dto.GetUserById(user_id).Email)
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":  timelines,
 			"public":    false,
@@ -111,6 +111,7 @@ func timeline(w http.ResponseWriter, r *http.Request) {
 			"loggedin":  true,
 			"sess_u_id": user_id,
 			"username":  dto.GetUsername(user_id),
+			//"image":     image,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -196,23 +197,25 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 		user_id = session.Values["userId"].(int)
 	}
 	profileuser := dto.GetUser(username)
+	user := dto.GetUsername(user_id)
 
 	if profileuser.Username != "" {
 		followed := dto.IsFollowing(user_id, profileuser.UserId)
 
 		var timelines = dto.GetUserTimeline(profileuser.UserId)
 
-		templ := template.Must(template.ParseFiles("./templates/tmp.html", "./templates/layout.html"))
+		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
 
 		err := templ.Execute(w, map[string]interface{}{
-			"timeline":    timelines,
-			"public":      false,
-			"loggedin":    userLoggedin(r),
-			"profileuser": profileuser,
-			"followed":    followed,
-			"visiting":    true,
-			"sess_u_id":   user_id,
-			"user":        username == profileuser.Username,
+			"timeline":     timelines,
+			"public":       false,
+			"loggedin":     userLoggedin(r),
+			"profileuser":  profileuser,
+			"followed":     followed,
+			"visiting":     true,
+			"type":         "user",
+			"sess_u_id":    user_id,
+			"loggedinuser": user == profileuser.Username,
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -242,7 +245,7 @@ func follow_user(w http.ResponseWriter, r *http.Request) {
 		}
 		dto.FollowUser(user_id, whom_id)
 		dialog.Alert("You are now following %s", username)
-		http.Redirect(w, r, "/{username}", 302)
+		http.Redirect(w, r, "/"+username, 302)
 	}
 }
 
@@ -265,7 +268,7 @@ func unfollow_user(w http.ResponseWriter, r *http.Request) {
 		}
 		dto.UnfollowUser(user_id, whom_id)
 		dialog.Alert("You are no longer following %s", username)
-		http.Redirect(w, r, "/{username}", 302)
+		http.Redirect(w, r, "/"+username, 302)
 	}
 }
 
