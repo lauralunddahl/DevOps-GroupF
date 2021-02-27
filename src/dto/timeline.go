@@ -14,6 +14,7 @@ type Timeline struct {
 	UserId   int
 	Email    string
 	PwHash   string
+	Image    string
 
 	MessageId int
 	AuthorId  int

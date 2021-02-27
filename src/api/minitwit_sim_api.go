@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
+
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 
 	"github.com/gorilla/mux"
@@ -19,6 +21,7 @@ type Timeline struct {
 	UserId   int
 	Email    string
 	PwHash   string
+	Image    string
 
 	MessageId int
 	AuthorId  int
@@ -119,7 +122,8 @@ func apiRegister(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			println(err.Error())
 		}
-		dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash))
+		image := helper.Gravatar_url(newReg.Email)
+		dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash), image)
 		fmt.Println(w, "You were successfully registered and can login now")
 	}
 	if err != "" {
