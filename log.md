@@ -43,3 +43,9 @@ likely make it easier for us to introduce a CI/CD setup.
 Deployment target: ? (Ubuntu?)
 
 ### CI/CD setup
+
+We have chosen to use a continious integration system in which we can run automated builds and later on also automated tests.
+This allows us to integrate our code often, into our master branch, from which we can automatically build our program.
+We have chosen to use Travis CI as our CI tool. Travis was chosen as it is easy to integrate with our GitHub, it offers many
+automated features/options and it is cloud based which means we do not need to run and maintain a server for it.
+
