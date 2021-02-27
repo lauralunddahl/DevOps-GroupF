@@ -1,12 +1,12 @@
 os: linux
 dist: bionic
 
-language: python
-python:
-  - 3.7
+language: go
+go:
+  - 1.13.8
 
 services:
-  - docker  # required, but travis uses older version of docker :(
+  - docker 
 
 before_install:
   # Decrypt the git_deploy_key.enc key into /tmp/git_deploy_key
@@ -38,28 +38,26 @@ jobs:
         - echo "BUILD"
         - docker build -t $DOCKER_USERNAME/minitwitimage:latest . -f Dockerfile-minitwit
         - docker build -t $DOCKER_USERNAME/mysqlimage:latest . -f Dockerfile-mysql
-        - docker build -t $DOCKER_USERNAME/flagtoolimage:latest . -f Dockerfile-flagtool
         - echo "PUSH"
         - docker push $DOCKER_USERNAME/minitwitimage:latest
         - docker push $DOCKER_USERNAME/mysqlimage:latest
-        - docker push $DOCKER_USERNAME/flagtoolimage:latest
 
-    - stage: test
-      name: "run pytest"
-      install: skip
-      script:
-        - docker build -t $DOCKER_USERNAME/minitwittestimage -f Dockerfile-minitwit-tests .
-        - yes | docker-compose up -d
-        - docker run -it --rm --network=itu-minitwit-network $DOCKER_USERNAME/minitwittestimage
+    #- stage: test
+    #  name: "run pytest"
+    #  install: skip
+    #  script:
+    #    - docker build -t $DOCKER_USERNAME/minitwittestimage -f Dockerfile-minitwit-tests .
+    #    - yes | docker-compose up -d
+    #    - docker run -it --rm --network=itu-minitwit-network $DOCKER_USERNAME/minitwittestimage
 
-    - stage: deploy
-      name: "deploy new version"
-      install: skip
-      # -o flag to get around "add ip to known hosts prompt"
-      script: |
-        ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
-        "source /root/.bash_profile && \
-        cd /vagrant && \
-        docker-compose pull && \
-        docker-compose up -d && \
-        docker pull $DOCKER_USERNAME/flagtoolimage:latest"
+    #- stage: deploy
+    #  name: "deploy new version"
+    #  install: skip
+    #  # -o flag to get around "add ip to known hosts prompt"
+    #  script: |
+    #    ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
+    #    "source /root/.bash_profile && \
+    #    cd /vagrant && \
+    #    docker-compose pull && \
+    #    docker-compose up -d && \
+    #    docker pull $DOCKER_USERNAME/flagtoolimage:latest"
