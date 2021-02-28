@@ -1,12 +1,13 @@
 package dto
 
-import database "db"
+import database "github.com/lauralunddahl/DevOps-GroupF/src/db"
 
 type User struct {
 	UserId   int
 	Username string
 	Email    string
 	PwHash   string
+	Image    string
 }
 
 func GetUserID(username string) int {
@@ -21,8 +22,20 @@ func GetUser(username string) User {
 	return user
 }
 
-func RegisterUser(username string, email string, password string) {
-	user := User{Username: username, Email: email, PwHash: password}
+func GetUserById(user_id int) User {
+	user := User{}
+	database.DB.Where("user_id = ?", user_id).First(&user)
+	return user
+}
+
+func GetUsername(userid int) string {
+	user := User{}
+	database.DB.Where("user_id = ?", userid).First(&user)
+	return user.Username
+}
+
+func RegisterUser(username string, email string, password string, image string) {
+	user := User{Username: username, Email: email, PwHash: password, Image: image}
 	result := database.DB.Create(&user)
 	if result.Error != nil {
 		print(result.Error)
