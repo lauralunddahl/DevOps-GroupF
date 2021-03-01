@@ -39,7 +39,7 @@ type Message struct {
 }
 
 type Latest struct {
-	La string `json:"latest"`
+	La int `json:"latest"`
 }
 
 type Response struct {
@@ -95,7 +95,7 @@ func update_latest(w http.ResponseWriter, r *http.Request) int {
 func Get_latest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var ls Latest
-	ls.La = strconv.Itoa(latest)
+	ls.La = latest 
 	json.NewEncoder(w).Encode(ls)
 }
 
