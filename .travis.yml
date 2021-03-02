@@ -10,7 +10,7 @@ services:
 
 before_install:
   # Decrypt the git_deploy_key.enc key into /tmp/git_deploy_key
-  - openssl aes-256-cbc -K $encrypted_3feba35f3fd3_key -iv $encrypted_3feba35f3fd3_iv -in do_ssh_key.enc -out do_ssh_key -d
+  - openssl aes-256-cbc -K $encrypted_3feba35f3fd3_key -iv $encrypted_3feba35f3fd3_iv -in do_ssh_key.enc -out /tmp/git_deploy_key -d
   # Make sure only the current user can read the private key
   - chmod 600 /tmp/git_deploy_key
   # Create a script to return the passphrase environment variable to ssh-add
@@ -37,10 +37,10 @@ jobs:
         - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
         - echo "BUILD"
         - docker build -t $DOCKER_USERNAME/minitwitimage:latest . -f Dockerfile-minitwit
-        - docker build -t $DOCKER_USERNAME/mysqlimage:latest . -f Dockerfile-mysql
+        #- docker build -t $DOCKER_USERNAME/mysqlimage:latest . -f Dockerfile-mysql
         - echo "PUSH"
         - docker push $DOCKER_USERNAME/minitwitimage:latest
-        - docker push $DOCKER_USERNAME/mysqlimage:latest
+        #- docker push $DOCKER_USERNAME/mysqlimage:latest
 
     #- stage: test
     #  name: "run pytest"
@@ -50,14 +50,14 @@ jobs:
     #    - yes | docker-compose up -d
     #    - docker run -it --rm --network=itu-minitwit-network $DOCKER_USERNAME/minitwittestimage
 
-    #- stage: deploy
-    #  name: "deploy new version"
-    #  install: skip
-    #  # -o flag to get around "add ip to known hosts prompt"
-    #  script: |
-    #    ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
-    #    "source /root/.bash_profile && \
-    #    cd /vagrant && \
-    #    docker-compose pull && \
-    #    docker-compose up -d && \
+    - stage: deploy
+      name: "deploy new version"
+      install: skip
+      # -o flag to get around "add ip to known hosts prompt"
+      script: |
+        ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
+        "source /root/.bash_profile && \
+        cd /vagrant && \
+        docker-compose pull && \
+        docker-compose up -d
     #    docker pull $DOCKER_USERNAME/flagtoolimage:latest"
