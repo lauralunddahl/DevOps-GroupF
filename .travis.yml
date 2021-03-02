@@ -24,7 +24,7 @@ jobs:
     - echo "LOGIN"
     - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
     - echo "BUILD"
-    - docker build -t $DOCKER_USERNAME/minitwitimage:latest . -f Dockerfile-minitwit
+    - docker build -t $DOCKER_USERNAME/minitwitimage:latest . -f Dockerfile
     - echo "PUSH"
     - docker push $DOCKER_USERNAME/minitwitimage:latest
   - stage: deploy
