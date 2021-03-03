@@ -19,8 +19,6 @@ Vagrant.configure("2") do |config|
     droplet.vm.provision "shell", inline: <<-SHELL
 
     echo -e "\nVerifying that docker works ...\n"
-    docker run --rm hello-world
-    docker rmi hello-world
 
     echo -e "\nOpening port for minitwit ...\n"
     ufw allow 5000
