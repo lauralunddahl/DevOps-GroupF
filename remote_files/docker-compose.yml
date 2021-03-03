@@ -3,7 +3,7 @@ networks:
     minitwit:
 services: 
   minitwitimage:
-    image: NannaMarcher/minitwitimage
+    image: ***REMOVED***/minitwitimage
     container_name: minitwit
     networks:
       - minitwit
