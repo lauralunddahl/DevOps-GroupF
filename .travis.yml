@@ -33,8 +33,7 @@ jobs:
     script: |
       ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
       " cd DevOps-GroupF && \
-      ls && \
-      cd /vagrant && \
+      cd remote_files && \
       ls && \
       docker-compose pull && \
       docker-compose up"
