@@ -3,9 +3,9 @@ networks:
     minitwit:
 services: 
   minitwitimage:
-    image: ${DOCKER_USERNAME}/minitwitimage
+    image: NannaMarcher/minitwitimage
     container_name: minitwit
     networks:
-      - main
+      - minitwit
     ports:
         - '5000:5000'
