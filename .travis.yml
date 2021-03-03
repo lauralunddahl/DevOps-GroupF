@@ -6,6 +6,8 @@ go:
 services:
 - docker
 before_install:
+- openssl aes-256-cbc -K $encrypted_3feba35f3fd3_key -iv $encrypted_3feba35f3fd3_iv
+  -in do_ssh_key.enc -out ~\/.ssh/do_ssh_key -d
 - openssl aes-256-cbc -K $encrypted_fb55de01ee40_key -iv $encrypted_fb55de01ee40_iv
   -in do_ssh_key.enc -out /tmp/git_deploy_key -d
 - chmod 600 /tmp/git_deploy_key
