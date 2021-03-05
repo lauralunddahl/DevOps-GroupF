@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
 	    provider.size = 's-1vcpu-1gb'
       	    override.nfs.functional = false
     	end
+    
     droplet.vm.hostname = "minitwit-server"
     droplet.vm.provision "shell", inline: <<-SHELL
 
