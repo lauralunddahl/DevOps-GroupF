@@ -8,5 +8,5 @@ services:
     networks:
       - minitwit
     ports:
-        - '8080:8080'
+        - '5000:5000'
         - '9090:9090'

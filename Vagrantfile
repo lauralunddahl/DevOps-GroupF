@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
     echo -e "\nVerifying that docker works ...\n"
 
     echo -e "\nOpening port for minitwit ...\n"
-    ufw allow 8080
+    ufw allow 5000
     ufw allow 9090
 
     echo -e "\nOpening port for minitwit ...\n"
