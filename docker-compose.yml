@@ -5,8 +5,9 @@ services:
         build: .
         ports:
             - "8080:8080"
+            - "9090:9090"
         restart: always
         networks: 
-            - minitwit
+            - main
 networks: 
-    minitwit:
+    main:
