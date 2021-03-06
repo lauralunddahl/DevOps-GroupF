@@ -8,6 +8,6 @@ services:
             - "9090:9090"
         restart: always
         networks: 
-            - main
+            - minitwit
 networks: 
-    main:
+    minitwit:
