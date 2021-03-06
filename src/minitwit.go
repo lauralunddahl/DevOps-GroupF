@@ -25,6 +25,7 @@ const per_page int = 30
 const debug bool = true
 const secret_key string = "development key"
 
+
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
@@ -369,7 +370,7 @@ func main() {
 	router.HandleFunc("/public", public_timeline)
 	router.HandleFunc("/add_message", add_message).Methods("POST")
 	router.HandleFunc("/logout", logout)
-
+	
 	router.HandleFunc("/latest", api.Get_latest).Methods("GET")
 	router.HandleFunc("/register", api.ApiRegister).Methods("POST")
 	router.HandleFunc("/msgs", api.Messages).Methods("GET")
