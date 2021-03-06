@@ -25,7 +25,6 @@ const per_page int = 30
 const debug bool = true
 const secret_key string = "development key"
 
-var router = mux.NewRouter()
 
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
@@ -213,7 +212,7 @@ func user_timeline(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		http.NotFound(w, r)
+		http.Error(w, "User not found", 404)
 	}
 }
 
@@ -232,7 +231,7 @@ func follow_user(w http.ResponseWriter, r *http.Request) {
 	} else {
 		whom_id := dto.GetUserID(username)
 		if whom_id == 0 {
-			http.NotFound(w, r)
+			http.Error(w, "User not found", 404)
 		}
 		dto.FollowUser(user_id, whom_id)
 		dialog.Alert("You are now following %s", username)
@@ -255,7 +254,7 @@ func unfollow_user(w http.ResponseWriter, r *http.Request) {
 	} else {
 		whom_id := dto.GetUserID(username)
 		if whom_id == 0 {
-			http.NotFound(w, r)
+			http.Error(w, "User not found", 404)
 		}
 		dto.UnfollowUser(user_id, whom_id)
 		dialog.Alert("You are no longer following %s", username)
@@ -358,6 +357,8 @@ func checkErr(err error) {
 }
 
 func main() {
+	router := mux.NewRouter()
+
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
 	router.HandleFunc("/", timeline).Methods("GET")
@@ -369,11 +370,16 @@ func main() {
 	router.HandleFunc("/public", public_timeline)
 	router.HandleFunc("/add_message", add_message).Methods("POST")
 	router.HandleFunc("/logout", logout)
+	
+	router.HandleFunc("/latest", api.Get_latest).Methods("GET")
+	router.HandleFunc("/register", api.ApiRegister).Methods("POST")
+	router.HandleFunc("/msgs", api.Messages).Methods("GET")
+	router.HandleFunc("/fllws/{username}", api.Follow).Methods("GET", "POST")
+	router.HandleFunc("/msgs/{username}", api.Messages_per_user).Methods("GET", "POST")
+
 	router.HandleFunc("/{username}", user_timeline).Methods("GET")
 	router.HandleFunc("/{username}/follow", follow_user)
 	router.HandleFunc("/{username}/unfollow", unfollow_user)
-
-	api.HandleApiRequest(router)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
