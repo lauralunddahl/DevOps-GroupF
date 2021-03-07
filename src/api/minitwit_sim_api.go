@@ -39,7 +39,7 @@ type Message struct {
 }
 
 type Latest struct {
-	La string `json:"latest"`
+	La int `json:"latest"`
 }
 
 type Response struct {
@@ -54,10 +54,9 @@ type ApiMessage struct {
 }
 
 type Register struct {
-	Username  string `json:"username"`
-	Email     string `json:"email" `
-	Password  string `json:"pwd"`
-	
+	Username string `json:"username"`
+	Email    string `json:"email" `
+	Password string `json:"pwd"`
 }
 
 type Followers struct {
@@ -93,14 +92,14 @@ func update_latest(w http.ResponseWriter, r *http.Request) int {
 	return latest
 }
 
-func get_latest(w http.ResponseWriter, r *http.Request) {
+func Get_latest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var ls Latest
-	ls.La = strconv.Itoa(latest)
+	ls.La = latest
 	json.NewEncoder(w).Encode(ls)
 }
 
-func apiRegister(w http.ResponseWriter, r *http.Request) {
+func ApiRegister(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	err := ""
 	var newReg Register
@@ -119,13 +118,13 @@ func apiRegister(w http.ResponseWriter, r *http.Request) {
 	if err != "" {
 		println(err)
 		res.Status = 400
-		res.ErrorMsg = err	
+		res.ErrorMsg = err
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	} else {
 		pw_hash, err := bcrypt.GenerateFromPassword([]byte(newReg.Password), bcrypt.MinCost)
 		if err != nil {
 			println(err.Error())
-		} else{
+		} else {
 			image := helper.Gravatar_url(newReg.Email)
 			dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash), image)
 			fmt.Println(w, "You were successfully registered and can login now")
@@ -134,12 +133,12 @@ func apiRegister(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		}
 	}
-	
+
 	json.NewEncoder(w).Encode(res)
-	
+
 }
 
-func messages(w http.ResponseWriter, r *http.Request) {
+func Messages(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	println("msgs!!!")
 
@@ -161,7 +160,7 @@ func messages(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(messages)
 }
 
-func messages_per_user(w http.ResponseWriter, r *http.Request) {
+func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	vars := mux.Vars(r)
 	username := vars["username"]
@@ -207,7 +206,7 @@ func messages_per_user(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func follow(w http.ResponseWriter, r *http.Request) {
+func Follow(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 
 	//not_req_from_simulator(w, r)
@@ -274,12 +273,4 @@ func follow(w http.ResponseWriter, r *http.Request) {
 		var followers = dto.GetFollowers(user_id, numb)
 		json.NewEncoder(w).Encode(followers)
 	}
-}
-
-func HandleApiRequest(router *mux.Router) {
-	router.HandleFunc("/latest", get_latest).Methods("GET")
-	router.HandleFunc("/register", apiRegister).Methods("POST")
-	router.HandleFunc("/msgs", messages).Methods("GET")
-	router.HandleFunc("/fllws/{username}", follow).Methods("GET", "POST")
-	router.HandleFunc("/msgs/{username}", messages_per_user).Methods("GET", "POST")
 }
