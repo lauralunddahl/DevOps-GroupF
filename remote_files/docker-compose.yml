@@ -1,0 +1,12 @@
+version: '3.3'
+networks: 
+    minitwit:
+services: 
+  minitwitimage:
+    image: ***REMOVED***/minitwitimage
+    container_name: minitwit
+    networks:
+      - minitwit
+    ports:
+        - '8080:8080'
+        - '9090:9090'
