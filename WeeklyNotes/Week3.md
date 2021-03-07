@@ -40,5 +40,5 @@ We are no longer in need of the GOPATH as we have created a go.mod file, where a
 - cd into DevOps-GroupF
 - branch master
 - pull latest changes
-- run: docker-compose --compatibility up --build
+- run: docker-compose up --build
 - tweet away

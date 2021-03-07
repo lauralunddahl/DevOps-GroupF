@@ -90,13 +90,12 @@ func update_latest(w http.ResponseWriter, r *http.Request) int {
 		latest = late
 	}
 	return latest
-	
 }
 
 func Get_latest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var ls Latest
-	ls.La = latest 
+	ls.La = latest
 	json.NewEncoder(w).Encode(ls)
 }
 
