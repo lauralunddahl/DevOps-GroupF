@@ -14,7 +14,6 @@ import (
 func main() {
 	router := mux.NewRouter()
 	apirouter := mux.NewRouter()
-	metricsRouter := mux.NewRouter()
 
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
@@ -35,13 +34,13 @@ func main() {
 	apirouter.HandleFunc("/msgs/{username}", api.Messages_per_user).Methods("GET", "POST")
 
 	metrics.RecordMetrics()
-	metricsRouter.Handle("/metrics", promhttp.Handler())
+	router.Handle("/metrics", promhttp.Handler())
 
 	router.HandleFunc("/{username}", minitwit.User_timeline).Methods("GET")
 	router.HandleFunc("/{username}/follow", minitwit.Follow_user)
 	router.HandleFunc("/{username}/unfollow", minitwit.Unfollow_user)
 
-	go func() { log.Fatal(http.ListenAndServe(":9090", metricsRouter)) }()
+	//go func() { log.Fatal(http.ListenAndServe(":9092", nil)) }()
 
 	go func() { log.Fatal(http.ListenAndServe(":9091", apirouter)) }()
 
