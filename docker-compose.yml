@@ -2,10 +2,11 @@ version: '3.3'
 services: 
     minitwit:
         image: minitwit:latest
+        container_name: minitwit_container
         build: .
         ports:
             - "8080:8080"
-            - "9091:9091"
+            - "9090:9091"
         restart: always
         networks: 
             - minitwit
@@ -19,7 +20,7 @@ services:
         volumes:
         - ./prometheus.yml:/etc/prometheus/prometheus.yml
         ports:
-        - "9090:9090"
+        - "9092:9090"
         networks:
         - minitwit
 
