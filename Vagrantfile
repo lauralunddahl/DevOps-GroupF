@@ -36,6 +36,7 @@ Vagrant.configure("2") do |config|
     echo -e "\nVagrant setup done ..."
     echo -e "minitwit will later be accessible at http://$(hostname -I | awk '{print $1}'):8080"
     echo -e "The mysql database needs a minute to initialize, if the landing page is stack-trace ..."
+    docker-compose down
     docker-compose up --build
     SHELL
     end
