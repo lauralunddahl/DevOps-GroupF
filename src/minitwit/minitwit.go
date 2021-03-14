@@ -125,7 +125,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	if user.Username == "" {
 		fmt.Fprintln(w, "invalid username")
 	}
-	println(user.Username)
 	//check password hash from database against input password from user
 	byteHash := []byte(user.PwHash)
 	bytePw := []byte(password)
@@ -179,8 +178,6 @@ func User_timeline(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "session1")
 
-	//session.Values["authenticated"] = false
-	//println(session.Values["authenticated"].(bool))
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		user_id = session.Values["userId"].(int)
 	}
@@ -261,12 +258,10 @@ func Unfollow_user(w http.ResponseWriter, r *http.Request) {
 }
 
 func Add_message(w http.ResponseWriter, r *http.Request) {
-	println("her")
 	user_id := 0
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		user_id = session.Values["userId"].(int)
-		println(user_id)
 	}
 	if user_id == 0 {
 		http.Error(w, "not authorized", 401)
@@ -295,7 +290,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleRegister(w http.ResponseWriter, r *http.Request) {
-	println("handle register")
 	err := ""
 	username := r.FormValue("username")
 	email := r.FormValue("email")
