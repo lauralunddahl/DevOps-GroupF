@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -128,7 +127,6 @@ func ApiRegister(w http.ResponseWriter, r *http.Request) {
 		} else {
 			image := helper.Gravatar_url(newReg.Email)
 			dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash), image)
-			fmt.Println(w, "You were successfully registered and can login now")
 			res.Status = 204
 			res.ErrorMsg = ""
 			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
@@ -141,7 +139,6 @@ func ApiRegister(w http.ResponseWriter, r *http.Request) {
 
 func Messages(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
-	println("msgs!!!")
 
 	//not_req_from_simulator(w, r)
 
@@ -165,6 +162,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	vars := mux.Vars(r)
 	username := vars["username"]
+	println(username)
 
 	//not_req_from_simulator(w, r)
 
@@ -179,7 +177,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		if user_id == 0 {
 			var res Response
 			res.Status = 500
-			res.ErrorMsg = "No user found"
+			res.ErrorMsg = "No user found for " + username
 			json.NewEncoder(w).Encode(res)
 		} else {
 			var timelines = dto.GetUserTimeline(user_id) //update to no_msg
