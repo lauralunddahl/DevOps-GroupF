@@ -23,7 +23,6 @@ const per_page int = 30
 const debug bool = true
 const secret_key string = "development key"
 
-
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
@@ -347,4 +346,3 @@ func checkErr(err error) {
 		panic(err)
 	}
 }
-
