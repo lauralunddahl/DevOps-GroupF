@@ -10,6 +10,7 @@ import (
 
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -228,6 +229,7 @@ func Follow_user(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "User not found", 404)
 		}
 		dto.FollowUser(user_id, whom_id)
+		metrics.IncrementFollows()
 		dialog.Alert("You are now following %s", username)
 		http.Redirect(w, r, "/"+username, 302)
 	}
@@ -251,6 +253,7 @@ func Unfollow_user(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "User not found", 404)
 		}
 		dto.UnfollowUser(user_id, whom_id)
+		metrics.IncrementUnfollows()
 		dialog.Alert("You are no longer following %s", username)
 		http.Redirect(w, r, "/"+username, 302)
 	}

@@ -41,3 +41,9 @@ func RegisterUser(username string, email string, password string, image string) 
 		print(result.Error)
 	}
 }
+
+func GetTotalNumberOfUsers() int {
+	var result int
+	database.DB.Table("users").Count(&result)
+	return result
+}
