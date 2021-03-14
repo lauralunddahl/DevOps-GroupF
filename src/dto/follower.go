@@ -39,3 +39,9 @@ func UnfollowUser(who_id int, whom_id int) {
 		print(result.Error)
 	}
 }
+
+func GetTotalNumberOfFollowerEntries() int {
+	var result int
+	database.DB.Table("followers").Count(&result)
+	return result
+}

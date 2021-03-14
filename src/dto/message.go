@@ -7,7 +7,7 @@ import (
 )
 
 type Message struct {
-	MessageId string
+	MessageId int
 	AuthorId  string
 	Text      string
 	PubDate   time.Time
@@ -20,4 +20,11 @@ func AddMessage(author_id string, text string, pub_date time.Time, flagged int) 
 	if result.Error != nil {
 		print(result.Error)
 	}
+}
+
+
+func GetTotalNumberOfMessages() int {
+	var result int
+	database.DB.Table("messages").Count(&result)
+	return result
 }
