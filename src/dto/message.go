@@ -7,7 +7,7 @@ import (
 )
 
 type Message struct {
-	MessageId string
+	MessageId int
 	AuthorId  string
 	Text      string
 	PubDate   time.Time
