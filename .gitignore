@@ -3,3 +3,4 @@ golang.org/
 tawesoft.co.uk/
 src/db/dbhandler.go
 .vagrant/
+.env
