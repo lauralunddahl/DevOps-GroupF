@@ -14,15 +14,15 @@ services:
             - grafana
             - prometheus
 
-    prometheus:
-        image: prom/prometheus
-        container_name: prometheus
-        volumes:
-        - ./prometheus.yml:/etc/prometheus/prometheus.yml
-        ports:
-        - "9092:9090"
-        networks:
-        - minitwit
+    #prometheus:
+    #    image: prom/prometheus
+    #    container_name: prometheus
+    #    volumes:
+    #    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    #    ports:
+    #    - "9092:9090"
+    #    networks:
+    #    - minitwit
 
 
     grafana:
