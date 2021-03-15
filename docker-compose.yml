@@ -5,8 +5,8 @@ services:
         container_name: minitwit_container
         build: .
         ports:
-            - "8080:8080"
             - "9090:9091"
+            - "8080:8080"
         restart: always
         networks: 
             - minitwit
