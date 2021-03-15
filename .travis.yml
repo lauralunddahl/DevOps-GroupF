@@ -39,4 +39,4 @@ jobs:
       "cd DevOps-GroupF/remote_files ; \
       docker-compose pull ; \
       docker-compose down  ; \
-      docker-compose up -d"
+      docker-compose up -d --build"
