@@ -1,5 +1,5 @@
 version: '3.3'
-services: 
+services:
     minitwit:
         image: minitwit:latest
         container_name: minitwit_container
@@ -8,7 +8,7 @@ services:
             - "8080:8080"
             - "9090:9091"
         restart: always
-        networks: 
+        networks:
             - minitwit
         depends_on:
             - grafana
@@ -28,10 +28,9 @@ services:
     grafana:
         image: grafana/grafana:4.5.2
         ports:
-        - "3000:3000"  
+        - "3000:3000"
         networks:
         - minitwit
 
-networks: 
+networks:
     minitwit:
-
