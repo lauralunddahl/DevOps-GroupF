@@ -47,6 +47,6 @@ func main() {
 	//log.Fatal(http.ListenAndServe(":8080", router))
 
 	test := mux.NewRouter()
-	test.HandleFunc("/", "HEJ").Methods("GET")
+	test.HandleFunc("/", nil).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
