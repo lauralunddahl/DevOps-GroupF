@@ -38,5 +38,5 @@ jobs:
       ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
       "cd DevOps-GroupF/remote_files ; \
       docker-compose pull ; \
-      docker-compose down ; \
+      docker-compose down  ; \
       docker-compose up -d"
