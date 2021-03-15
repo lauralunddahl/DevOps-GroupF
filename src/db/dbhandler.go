@@ -10,8 +10,8 @@ import (
 var DB *gorm.DB
 
 func init() {
-	database, err := gorm.Open("mysql", "fibonacci:***REMOVED***@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local")
-	//database, err := gorm.Open("mysql", "minitwit:***REMOVED***@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local")	
+	database, err := gorm.Open("mysql", "**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local")
+	//database, err := gorm.Open("mysql", "**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local")	
 //defer db.Close()
 	if err != nil {
 		fmt.Println(err)
