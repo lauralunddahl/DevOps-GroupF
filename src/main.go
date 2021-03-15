@@ -42,8 +42,11 @@ func main() {
 
 	//go func() { log.Fatal(http.ListenAndServe(":9092", nil)) }()
 
-	go func() { log.Fatal(http.ListenAndServe(":9090", apirouter)) }()
+	//go func() { log.Fatal(http.ListenAndServe(":9090", apirouter)) }()
 
+	//log.Fatal(http.ListenAndServe(":8080", router))
+
+	test := mux.NewRouter()
+	test.HandleFunc("/", "HEJ").Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
-
 }
