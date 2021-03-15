@@ -19,6 +19,7 @@ install:
 - docker --version
 stages:
 - docker_build
+- deploy
 jobs:
   include:
   - stage: docker_build
@@ -36,5 +37,6 @@ jobs:
     script: |
       ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
       "cd DevOps-GroupF/remote_files && \
+      docker-compose down && \
       docker-compose pull && \
-      docker-compose up"
+      docker-compose up --build -d"
