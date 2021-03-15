@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	// api "github.com/lauralunddahl/DevOps-GroupF/src/api"
+	api "github.com/lauralunddahl/DevOps-GroupF/src/api"
 	// metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
 	// minitwit "github.com/lauralunddahl/DevOps-GroupF/src/minitwit"
 	// promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
@@ -47,6 +47,6 @@ func main() {
 	//log.Fatal(http.ListenAndServe(":8080", router))
 
 	test := mux.NewRouter()
-	test.HandleFunc("/", nil).Methods("GET")
+	test.HandleFunc("/", api.Get_latest).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", test))
 }
