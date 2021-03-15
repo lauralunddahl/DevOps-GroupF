@@ -10,7 +10,13 @@ import (
 var DB *gorm.DB
 
 func init() {
-	database, err := gorm.Open("mysql", "**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local")
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	password := os.Getenv("DB_PASSWORD")
+
+	database, err := gorm.Open("mysql", "fibonacci:"+password+"@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local")
 	//database, err := gorm.Open("mysql", "**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local")	
 //defer db.Close()
 	if err != nil {
