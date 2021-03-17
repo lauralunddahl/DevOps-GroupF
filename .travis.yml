@@ -38,6 +38,6 @@ jobs:
       ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
       "cd DevOps-GroupF/remote_files && \
       echo DB_PASSWORD=${DB_PASSWORD} > .env && \
-      docker-compose down && \
-      docker-compose pull && \
+      docker-compose down ; \
+      docker-compose pull ; \
       docker-compose up -d"
