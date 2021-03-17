@@ -1,7 +1,7 @@
 version: '3.3'
 services:
     minitwit:
-        image: minitwit:latest
+        image: nannamarcher/minitwitimage:latest
         container_name: minitwit_container
         build: .
         ports:
