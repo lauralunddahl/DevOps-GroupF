@@ -13,6 +13,6 @@ RUN go mod download
 RUN GOOS=linux go build -o ./out/minitwit
 
 EXPOSE 8080
-EXPOSE 9090
+EXPOSE 8081
 
 CMD ["./out/minitwit"]

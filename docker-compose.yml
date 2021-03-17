@@ -6,7 +6,7 @@ services:
         build: .
         ports:
             - "8080:8080"
-            - "9090:9091"
+            - "8081:8081"
         restart: always
         networks: 
             - minitwit
@@ -20,7 +20,7 @@ services:
         volumes:
         - ./prometheus.yml:/etc/prometheus/prometheus.yml
         ports:
-        - "9092:9090"
+        - "9090:9090"
         networks:
         - minitwit
 
