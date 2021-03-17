@@ -35,6 +35,7 @@ jobs:
     name: deploy new version
     install: skip
     script: |
+      scp docker-compose.yml ${MT_USER}@${MT_SERVER}:/vagrant
       ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
       "cd /vagrant && \
       echo DB_PASSWORD=${DB_PASSWORD} > .env && \
