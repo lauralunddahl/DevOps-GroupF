@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
         droplet.vm.provider :digital_ocean do |provider, override|
 	    provider.ssh_key_name = ENV["SSH_KEY_NAME"]
 	    provider.token = ENV["DIGITAL_OCEAN_TOKEN"]
-	    provider.image = 'ubuntu-18-04-x64'
+	    provider.image = 'docker-18-04'
 	    provider.region = 'nyc1'
 	    provider.size = 's-1vcpu-1gb'
       	    override.nfs.functional = false
@@ -26,15 +26,13 @@ Vagrant.configure("2") do |config|
 
     echo -e "\nOpening port for minitwit ...\n"
     ufw allow 8080
-    ufw allow 9090:9091/tcp
-    ufw allow 9092:9090/tcp
 
     echo -e "\nOpening port for minitwit ...\n"
     echo ". $HOME/.bashrc" >> $HOME/.bash_profile
 
     echo -e "\nConfiguring credentials as environment variables...\n"
-    echo "export DOCKER_USERNAME='**REMOVED**'" >> $HOME/.bash_profile
-    echo "export DOCKER_PASSWORD='**REMOVED**'" >> $HOME/.bash_profile
+    echo "export DOCKER_USERNAME='nannamarcher'" >> $HOME/.bash_profile
+    echo "export DOCKER_PASSWORD='devopsminitwit'" >> $HOME/.bash_profile
     source $HOME/.bash_profile
 
     echo -e "\nVagrant setup done ..."
