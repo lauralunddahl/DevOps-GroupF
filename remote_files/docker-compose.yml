@@ -6,34 +6,33 @@ services:
         build: .
         ports:
             - "8080:8080"
-            - "9090:9090"
+            - "8081:8081"
         restart: always
         networks:
             - minitwit
-        env_file:
-            - .env
-        #depends_on:
-            #- grafana
-            #- prometheus
 
-    #prometheus:
-    #    image: prom/prometheus
-    #    container_name: prometheus
-    #    volumes:
-    #    - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    #    ports:
-    #    - "9092:9090"
-    #    networks:
-    #    - minitwit
+    prometheus:
+        image: prom/prometheus
+        container_name: prometheus
+        volumes:
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+        ports:
+        - "9090:9090"
+        networks:
+        - minitwit
+        depends_on:
+        - minitwit
 
+    grafana:
+        image: grafana/grafana:4.5.2
+        container_name: grafana
+        ports:
+        - "3000:3000"  
+        networks:
+        - minitwit
+        depends_on:
+        - minitwit
 
-    #grafana:
-    #    image: grafana/grafana:4.5.2
-    #    ports:
-    #    - "3000:3000"
-    #    networks:
-    #    - minitwit
-
-networks:
+networks: 
     minitwit:
 

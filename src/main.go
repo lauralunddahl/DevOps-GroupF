@@ -42,7 +42,7 @@ func main() {
 
 	go func() { log.Fatal(http.ListenAndServe(":9092", nil)) }()
 
-	go func() { log.Fatal(http.ListenAndServe(":9090", apirouter)) }()
+	go func() { log.Fatal(http.ListenAndServe(":8081", apirouter)) }()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
