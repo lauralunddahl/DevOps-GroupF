@@ -30,10 +30,6 @@ jobs:
     - docker build -t $DOCKER_USERNAME/minitwitimage:latest . -f Dockerfile
     - echo "PUSH"
     - docker push $DOCKER_USERNAME/minitwitimage:latest
-    - echo "PULL"
-    - docker pull grafana/grafana
-    - docker pull prom/prometheus
-    - docker run -d -p 3000:3000 grafana/grafana
   - stage: deploy
     name: deploy new version
     install: skip

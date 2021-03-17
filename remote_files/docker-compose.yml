@@ -23,15 +23,21 @@ services:
         depends_on:
         - minitwit
 
-
     grafana:
         image: grafana/grafana:4.5.2
+        container_name: grafana
         ports:
-        - "3000:3000"
+        - "3000:3000"  
         networks:
         - minitwit
         depends_on:
         - minitwit
+        volumes: 
+        - grafana-data:/var/lib/grafana
 
-networks:
+networks: 
     minitwit:
+
+volumes:
+  grafana-data:
+    external: true
