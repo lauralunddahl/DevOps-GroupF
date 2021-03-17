@@ -10,9 +10,6 @@ services:
         restart: always
         networks:
             - minitwit
-        depends_on:
-            - grafana
-            - prometheus
 
     prometheus:
         image: prom/prometheus
@@ -23,6 +20,8 @@ services:
         - "9090:9090"
         networks:
         - minitwit
+        depends_on:
+        - minitwit
 
 
     grafana:
@@ -30,6 +29,8 @@ services:
         ports:
         - "3000:3000"
         networks:
+        - minitwit
+        depends_on:
         - minitwit
 
 networks:
