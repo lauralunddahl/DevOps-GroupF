@@ -33,6 +33,7 @@ jobs:
     - echo "PULL"
     - docker pull grafana/grafana
     - docker pull prom/prometheus
+    - docker run -d -p 3000:3000 grafana/grafana
   - stage: deploy
     name: deploy new version
     install: skip
