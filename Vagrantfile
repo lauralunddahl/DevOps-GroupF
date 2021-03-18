@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.synced_folder "remote_files", "/vagrant", type: "rsync"
 
-    config.vm.define "droplet1" do |droplet|
+    config.vm.define "droplet2" do |droplet|
         droplet.vm.provider :digital_ocean do |provider, override|
 	    provider.ssh_key_name = ENV["SSH_KEY_NAME"]
 	    provider.token = ENV["DIGITAL_OCEAN_TOKEN"]
