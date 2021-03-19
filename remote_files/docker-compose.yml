@@ -16,6 +16,7 @@ services:
         container_name: prometheus
         volumes:
         - remote_files/prometheus.yml:/etc/prometheus/prometheus.yml
+        - prometheus-data:/prometheus
         ports:
         - "9090:9090"
         networks:
@@ -35,4 +36,7 @@ services:
 
 networks: 
     minitwit:
+
+volumes:
+  prometheus-data:
 
