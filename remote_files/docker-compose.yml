@@ -38,5 +38,5 @@ networks:
     minitwit:
 
 volumes:
-  prometheus-data:
+  prometheus-data: {}
 
