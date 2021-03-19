@@ -14,3 +14,9 @@ func Gravatar_url(email string) string {
 	sha1_hash := hex.EncodeToString(h.Sum(nil))
 	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", sha1_hash, size)
 }
+
+func CheckErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

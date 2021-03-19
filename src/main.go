@@ -28,7 +28,7 @@ func main() {
 	router.HandleFunc("/logout", minitwit.Logout)
 
 	apirouter.HandleFunc("/latest", api.Get_latest).Methods("GET")
-	apirouter.HandleFunc("/register", api.ApiRegister).Methods("POST")
+	apirouter.HandleFunc("/register", api.RegisterUser).Methods("POST")
 	apirouter.HandleFunc("/msgs", api.Messages).Methods("GET")
 	apirouter.HandleFunc("/fllws/{username}", api.Follow).Methods("GET", "POST")
 	apirouter.HandleFunc("/msgs/{username}", api.Messages_per_user).Methods("GET", "POST")

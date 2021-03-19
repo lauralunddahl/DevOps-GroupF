@@ -8,78 +8,23 @@ import (
 	"time"
 
 	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
-
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Timeline struct {
-	Username string
-	UserId   int
-	Email    string
-	PwHash   string
-	Image    string
-
-	MessageId int
-	AuthorId  int
-	Text      string
-	PubDate   time.Time
-	Flagged   int
-}
-
-type Message struct {
-	MessageId string
-	AuthorId  string
-	Text      string
-	PubDate   time.Time
-	Flagged   int
-}
-
-type Latest struct {
-	La int `json:"latest"`
-}
-
-type Response struct {
-	Status   int    `json:"status"`
-	ErrorMsg string `json:"error_msg"`
-}
-
-type ApiMessage struct {
-	Content string    `json:"content"`
-	PubDate time.Time `json:"pub_date"`
-	User    string    `json:"user"`
-}
-
-type Register struct {
-	Username string `json:"username"`
-	Email    string `json:"email" `
-	Password string `json:"pwd"`
-}
-
-type Followers struct {
-	Username string `json:"username"`
-}
-type FollowUser struct {
-	Follow   string `json:"follow"`
-	Unfollow string `json:"unfollow"`
-}
-
 var latest = 0
-
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
 
 func not_req_from_simulator(w http.ResponseWriter, r *http.Request) {
 	fromSim := r.Header.Get("Authorization")
 	w.Header().Set("Content-Type", "application/json")
 	if fromSim != "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh" {
 		err := "You are not authorized to use this resource!"
-		json.NewEncoder(w).Encode(err)
+		var res Response
+		res.Status = 403
+		res.ErrorMsg = err
+		json.NewEncoder(w).Encode(res)
 	}
 }
 
@@ -94,11 +39,11 @@ func update_latest(w http.ResponseWriter, r *http.Request) int {
 func Get_latest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var ls Latest
-	ls.La = latest
+	ls.Latest = latest
 	json.NewEncoder(w).Encode(ls)
 }
 
-func ApiRegister(w http.ResponseWriter, r *http.Request) {
+func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	err := ""
 	var newReg Register
@@ -131,9 +76,7 @@ func ApiRegister(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		}
 	}
-
 	json.NewEncoder(w).Encode(res)
-
 }
 
 func Messages(w http.ResponseWriter, r *http.Request) {
@@ -161,7 +104,6 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	vars := mux.Vars(r)
 	username := vars["username"]
-	println(username)
 
 	//not_req_from_simulator(w, r)
 
@@ -175,7 +117,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		user_id := dto.GetUserID(username)
 		if user_id == 0 {
 			var res Response
-			res.Status = 500
+			res.Status = 404
 			res.ErrorMsg = "No user found for " + username
 			json.NewEncoder(w).Encode(res)
 		} else {
@@ -200,7 +142,6 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		res.ErrorMsg = ""
 		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		json.NewEncoder(w).Encode(res)
-
 	}
 }
 
@@ -226,7 +167,6 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
-
 	case "POST":
 		w.Header().Set("Content-Type", "application/json")
 		var follows FollowUser
