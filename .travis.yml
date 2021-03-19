@@ -41,7 +41,7 @@ jobs:
     before_script:
     - export SSHPASS=$SSH_PRIVATE
     - sshpass -e scp -o "StrictHostKeyChecking no" remote_files/docker-compose.yml ${MT_USER}@${MT_SERVER}:/vagrant/
-    - sshpass -e scp -o "StrictHostKeyChecking no" -r prometheus.yml ${MT_USER}@${MT_SERVER}:/vagrant/
+    - sshpass -e scp -o "StrictHostKeyChecking no" remote_files/prometheus.yml ${MT_USER}@${MT_SERVER}:/vagrant/
     script: |
       ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
       "cd /vagrant && \
