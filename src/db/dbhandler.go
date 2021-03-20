@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	//"os"
+	"os"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
@@ -14,9 +14,9 @@ func init() {
 	// if err != nil {
 	// 	log.Fatalf("Error loading .env file")
 	// }
-	//password := os.Getenv("DB_PASSWORD")
+	password := os.Getenv("DB_PASSWORD")
 	
-	database, err := gorm.Open("mysql", "fibonacci:f0psD3v1123@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local")
+	database, err := gorm.Open("mysql", "fibonacci:"+password+"@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local")
 	//database, err := gorm.Open("mysql", "**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local")	
 //defer db.Close()
 	if err != nil {

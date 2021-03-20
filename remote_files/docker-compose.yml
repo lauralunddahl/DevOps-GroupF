@@ -10,6 +10,8 @@ services:
         restart: always
         networks:
             - minitwit
+        env_file:
+            - .env
 
     prometheus:
         image: prom/prometheus
