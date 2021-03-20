@@ -32,7 +32,11 @@ services:
         - minitwit
         depends_on:
         - minitwit
+        volumes:
+        - grafana-storage:/var/lib/grafana
 
 networks:
     minitwit:
 
+volumes:
+  grafana-storage:
