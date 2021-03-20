@@ -19,53 +19,11 @@ import (
 	"tawesoft.co.uk/go/dialog"
 )
 
-const database string = "../minitwit.db"
-const per_page int = 30
-const debug bool = true
-const secret_key string = "development key"
-
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
 )
-
-type User struct {
-	Username string
-	UserId   string
-	Email    string
-	PwHash   string
-	Image    string
-}
-
-type Message struct {
-	MessageId string
-	AuthorId  string
-	Text      string
-	PubDate   string
-	Flagged   int
-}
-
-type Timeline struct {
-	Username string
-	UserId   int
-	Email    string
-	PwHash   string
-	Image    string
-
-	MessageId int
-	AuthorId  int
-	Text      string
-	PubDate   time.Time
-	Flagged   int
-}
-
-func format_datetime(timestamp string) string {
-	const layout = "2016-03-28 @ 08:30"
-	t, err := time.Parse(layout, timestamp)
-	checkErr(err)
-	return t.String()
-}
 
 func Before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -80,8 +38,6 @@ func Before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 		handler(w, r)
 	}
 }
-
-//Not sure if we need the after_request function
 
 func Private_timeline(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session1")
@@ -339,13 +295,4 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["userId"] = ""
 	session.Save(r, w)
 	http.Redirect(w, r, "/", 302)
-}
-
-func printSlice(s []Timeline) {
-	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
-}
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
