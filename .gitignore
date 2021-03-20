@@ -1,6 +1,6 @@
 github.com/
 golang.org/
 tawesoft.co.uk/
-src/db/dbhandler.go
+src/db/
 .vagrant/
 .env

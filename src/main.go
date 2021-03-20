@@ -40,10 +40,7 @@ func main() {
 	router.HandleFunc("/{username}/follow", minitwit.Follow_user)
 	router.HandleFunc("/{username}/unfollow", minitwit.Unfollow_user)
 
-	go func() { log.Fatal(http.ListenAndServe(":9092", nil)) }()
-
-	go func() { log.Fatal(http.ListenAndServe(":9091", apirouter)) }()
+	go func() { log.Fatal(http.ListenAndServe(":8081", apirouter)) }()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
-
 }
