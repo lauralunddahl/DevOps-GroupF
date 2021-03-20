@@ -28,7 +28,7 @@ func main() {
 	router.HandleFunc("/logout", minitwit.Logout)
 
 	apirouter.HandleFunc("/latest", api.Get_latest).Methods("GET")
-	apirouter.HandleFunc("/register", api.ApiRegister).Methods("POST")
+	apirouter.HandleFunc("/register", api.RegisterUser).Methods("POST")
 	apirouter.HandleFunc("/msgs", api.Messages).Methods("GET")
 	apirouter.HandleFunc("/fllws/{username}", api.Follow).Methods("GET", "POST")
 	apirouter.HandleFunc("/msgs/{username}", api.Messages_per_user).Methods("GET", "POST")
@@ -40,10 +40,7 @@ func main() {
 	router.HandleFunc("/{username}/follow", minitwit.Follow_user)
 	router.HandleFunc("/{username}/unfollow", minitwit.Unfollow_user)
 
-	//go func() { log.Fatal(http.ListenAndServe(":9092", nil)) }()
-
-	go func() { log.Fatal(http.ListenAndServe(":9091", apirouter)) }()
+	go func() { log.Fatal(http.ListenAndServe(":8081", apirouter)) }()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
-
 }

@@ -12,5 +12,6 @@ require (
 	github.com/yosssi/gohtml v0.0.0-20201013000340-ee4748c638f4 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/net v0.0.0-20210224082022-3d97a244fca7 // indirect
+	honnef.co/go/tools v0.1.3 // indirect
 	tawesoft.co.uk/go v0.0.0-20201219150124-f620b4792652
 )
