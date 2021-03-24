@@ -22,16 +22,11 @@ before_install:
 install:
 - docker --version
 stages:
-- test
 - docker_build
+- test
 - deploy
 jobs:
   include:
-  - stage: test
-    before_script:
-    - go get honnef.co/go/tools/cmd/staticcheck
-    script: 
-    - staticcheck ./src/...
   - stage: docker_build
     name: build and push docker
     script:
@@ -41,6 +36,11 @@ jobs:
     - docker build -t $DOCKER_USERNAME/minitwitimage:latest . -f Dockerfile
     - echo "PUSH"
     - docker push $DOCKER_USERNAME/minitwitimage:latest
+  - stage: test
+    before_script:
+    - go get honnef.co/go/tools/cmd/staticcheck
+    script: 
+    - staticcheck ./src/...
   - stage: deploy
     name: deploy new version
     install: skip
