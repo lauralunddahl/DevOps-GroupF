@@ -6,6 +6,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
+	mem "github.com/shirou/gopsutil/mem"
 )
 
 func RecordMetrics() {
@@ -13,6 +14,7 @@ func RecordMetrics() {
 		prometheus.MustRegister(users)
 		prometheus.MustRegister(averageFollowers)
 		prometheus.MustRegister(averagePosts)
+		prometheus.MustRegister(memory)
 		for {
 			var numberOfUsers = float64(dto.GetTotalNumberOfUsers())
 			var numberOfFollowers = float64(dto.GetTotalNumberOfFollowerEntries())
@@ -20,6 +22,8 @@ func RecordMetrics() {
 			users.Set(numberOfUsers)
 			averageFollowers.Set(numberOfFollowers/numberOfUsers)
 			averagePosts.Set(numberOfPosts/numberOfUsers)
+			v, _ := mem.VirtualMemory()
+			memory.Set(float64(v.Free))
 			time.Sleep(60*60*time.Second)
 		}
 	}()
@@ -59,5 +63,9 @@ var (
 	averagePosts = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:       "average_posts_per_user",
 		Help:       "Number of average posts per user",
+	})
+	memory = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:       "virtual_memory",
+		Help:       "Information about the virtual memory",
 	})
 )
