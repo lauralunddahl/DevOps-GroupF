@@ -38,6 +38,7 @@ jobs:
     - docker push $DOCKER_USERNAME/minitwitimage:latest
   - stage: test
     before_script:
+    - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
     - go get honnef.co/go/tools/cmd/staticcheck
     script: 
     - staticcheck ./...
