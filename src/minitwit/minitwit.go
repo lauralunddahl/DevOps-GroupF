@@ -43,7 +43,7 @@ func Private_timeline(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session1")
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Redirect(w, r, "/public", 302)
+		http.Redirect(w, r, "/public", http.StatusFound)
 	} else {
 		user_id := session.Values["userId"].(int)
 		var timelines = dto.GetPrivateTimeline(user_id)
@@ -94,7 +94,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = true
 	session.Values["userId"] = user.UserId
 	session.Save(r, w)
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func userLoggedin(r *http.Request) bool {
@@ -178,7 +178,7 @@ func Follow_user(w http.ResponseWriter, r *http.Request) {
 		user_id = session.Values["userId"].(int)
 	}
 	if user_id == 0 {
-		http.Error(w, "not authorized", 401)
+		http.Error(w, "not authorized", http.StatusUnauthorized)
 	} else {
 		whom_id := dto.GetUserID(username)
 		if whom_id == 0 {
@@ -187,7 +187,7 @@ func Follow_user(w http.ResponseWriter, r *http.Request) {
 		dto.FollowUser(user_id, whom_id)
 		metrics.IncrementFollows()
 		dialog.Alert("You are now following %s", username)
-		http.Redirect(w, r, "/"+username, 302)
+		http.Redirect(w, r, "/"+username, http.StatusFound)
 	}
 }
 
@@ -202,7 +202,7 @@ func Unfollow_user(w http.ResponseWriter, r *http.Request) {
 		user_id = session.Values["userId"].(int)
 	}
 	if user_id == 0 {
-		http.Error(w, "not authorized", 401)
+		http.Error(w, "not authorized", http.StatusUnauthorized)
 	} else {
 		whom_id := dto.GetUserID(username)
 		if whom_id == 0 {
@@ -211,7 +211,7 @@ func Unfollow_user(w http.ResponseWriter, r *http.Request) {
 		dto.UnfollowUser(user_id, whom_id)
 		metrics.IncrementUnfollows()
 		dialog.Alert("You are no longer following %s", username)
-		http.Redirect(w, r, "/"+username, 302)
+		http.Redirect(w, r, "/"+username, http.StatusFound)
 	}
 }
 
@@ -222,12 +222,12 @@ func Add_message(w http.ResponseWriter, r *http.Request) {
 		user_id = session.Values["userId"].(int)
 	}
 	if user_id == 0 {
-		http.Error(w, "not authorized", 401)
+		http.Error(w, "not authorized", http.StatusUnauthorized)
 	} else {
 		text := r.FormValue("text")
 		dto.AddMessage(strconv.Itoa(user_id), text, time.Now(), 0)
 		dialog.Alert("Your message was recorded")
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -238,7 +238,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		err = register.Execute(w, nil)
 		if err != nil {
@@ -272,7 +272,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 			image := helper.Gravatar_url(email)
 			dto.RegisterUser(username, email, string(pw_hash), image)
 			fmt.Println(w, "You were successfully registered and can login now")
-			http.Redirect(w, r, "/login", 302)
+			http.Redirect(w, r, "/login", http.StatusFound)
 		}
 	}
 
@@ -294,5 +294,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = false
 	session.Values["userId"] = ""
 	session.Save(r, w)
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
