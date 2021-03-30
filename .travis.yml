@@ -39,12 +39,12 @@ jobs:
   - stage: test
     before_script:
     - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
-    - go get honnef.co/go/tools/cmd/staticcheck
+    #- go get honnef.co/go/tools/cmd/staticcheck
     - cd src/
     - go build 
     script: 
-    - staticcheck ./...
-    - go vet ./..
+    #- staticcheck ./...
+    - go vet ./...
   - stage: deploy
     name: deploy new version
     install: skip
