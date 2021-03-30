@@ -3,7 +3,7 @@ dist: bionic
 language: go
 go:
 - 1.13.8
-- master
+- tip
 branches:
   only:
   - master
@@ -26,6 +26,10 @@ stages:
 - docker_build
 - test
 - deploy
+matrix:
+  allow_failures:
+    - go: tip
+  fast_finish: true
 jobs:
   include:
   - stage: docker_build
@@ -38,16 +42,11 @@ jobs:
     - echo "PUSH"
     - docker push $DOCKER_USERNAME/minitwitimage:latest
   - stage: test
-    matrix:
-      allow_failures:
-        - go: master
-      fast_finish: true
     before_script:
     - go get honnef.co/go/tools/cmd/staticcheck
     - cd src/
     - go build 
     script: 
-    - diff -u <(echo -n) <(gofmt -d -s .)
     - go vet ./...
     - staticcheck ./... -checks -U1000
   - stage: deploy
