@@ -8,7 +8,6 @@ branches:
   - master
 services:
 - docker
-
 addons:
     apt:
         packages:
@@ -45,7 +44,6 @@ jobs:
     script: 
     - go vet ./...
     - staticcheck ./...
-    - if [exit 1]; then exit 0; fi
   - stage: deploy
     name: deploy new version
     install: skip
