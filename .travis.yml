@@ -44,6 +44,7 @@ jobs:
     - go build 
     script: 
     - staticcheck ./...
+    - go vet ./..
   - stage: deploy
     name: deploy new version
     install: skip
