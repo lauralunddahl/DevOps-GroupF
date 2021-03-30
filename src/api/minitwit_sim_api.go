@@ -16,6 +16,18 @@ import (
 
 var latest = 0
 
+func not_req_from_simulator(w http.ResponseWriter, r *http.Request) {
+	fromSim := r.Header.Get("Authorization")
+	w.Header().Set("Content-Type", "application/json")
+	if fromSim != "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh" {
+		err := "You are not authorized to use this resource!"
+		var res Response
+		res.Status = 403
+		res.ErrorMsg = err
+		json.NewEncoder(w).Encode(res)
+	}
+}
+
 func update_latest(w http.ResponseWriter, r *http.Request) int {
 	late, _ := strconv.Atoi(r.URL.Query().Get("latest"))
 	if late != 0 {
