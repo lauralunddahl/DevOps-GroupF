@@ -3,11 +3,15 @@ dist: bionic
 language: go
 go:
 - 1.13.8
- #branches:
-  # only:
-   #  - master
+branches:
+  only:
+  - master
 services:
 - docker
+addons:
+    apt:
+        packages:
+            - sshpass
 before_install:
 - openssl aes-256-cbc -K $encrypted_3feba35f3fd3_key -iv $encrypted_3feba35f3fd3_iv
   -in do_ssh_key.enc -out /tmp/git_deploy_key -d
@@ -19,6 +23,7 @@ install:
 - docker --version
 stages:
 - docker_build
+- deploy
 jobs:
   include:
   - stage: docker_build
@@ -33,8 +38,14 @@ jobs:
   - stage: deploy
     name: deploy new version
     install: skip
+    before_script:
+    - export SSHPASS=$SSH_PRIVATE
+    - sshpass -e scp -o "StrictHostKeyChecking no" remote_files/docker-compose.yml ${MT_USER}@${MT_SERVER}:/vagrant/
+    - sshpass -e scp -o "StrictHostKeyChecking no" remote_files/prometheus.yml ${MT_USER}@${MT_SERVER}:/vagrant/
     script: |
       ssh -o "StrictHostKeyChecking no" ${MT_USER}@${MT_SERVER} \
-      "cd DevOps-GroupF/remote_files && \
+      "cd /vagrant && \
+      echo DB_PASSWORD=${DB_PASSWORD} > .env && \
+      docker-compose down && \
       docker-compose pull && \
-      docker-compose up"
+      docker-compose up -d"
