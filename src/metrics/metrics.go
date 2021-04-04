@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"time"
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
@@ -30,8 +29,6 @@ func RecordMetrics() {
 			v, _ := mem.VirtualMemory()
 
 			c,_ := cpu.Percent(0,false)
-
-			fmt.Println(c)
 
 			memoryFree.Set(float64(v.Free))
 			memoryPercentage.Set(v.UsedPercent)
