@@ -40,3 +40,12 @@ digraph G {
   "go compiler" -> "Ubuntu"
 }
 ```
+## Licenses
+- Gorilla mux: BSD 3-Clause 
+- GORM: MIT 
+- mysql: Mozilla public license 2.0
+- grafana: Apache License 2.0
+- prometheus: Apache License 2.0
+- ELK (kibana + elasticsearch): Server Side Public License (SSPL) and the Elastic License (https://www.zdnet.com/article/elastic-changes-open-source-license-to-monetize-cloud-service-use/)
+- filebeat: Elastic License
+- crypto: Boost Software License (?) (https://github.com/golang/crypto/blob/master/LICENSE)
