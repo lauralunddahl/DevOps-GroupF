@@ -12,6 +12,7 @@ import (
 )
 
 var bytes_to_gigabytes = float64(1073741824)
+var number_of_https_requests = 0
 
 func RecordMetrics() {
 	go func() {
@@ -37,20 +38,32 @@ func RecordMetrics() {
 			memoryAvailable.Set(float64(v.Available)/bytes_to_gigabytes)
 			memoryPercentage.Set(v.UsedPercent)
 			cpuPercentage.Set(c[0])
-			time.Sleep(60*60*time.Second)
+
+			httpRequests.Set(float64(number_of_https_requests))
+			fmt.Println(httpRequests)
+			fmt.Println(number_of_https_requests)
+			number_of_https_requests = 0
+
+			time.Sleep(10*time.Second)
 		}
 	}()
 }
 
 func IncrementFollows() {
 	go func() {
-		followed.Inc()
+		//followed.Inc()
 	}()
 }
 
 func IncrementUnfollows() {
 	go func() {
-		unfollowed.Inc()
+		//unfollowed.Inc()
+	}()
+}
+
+func IncrementRequests(){
+	go func(){
+		number_of_https_requests = number_of_https_requests + 1
 	}()
 }
 
@@ -119,4 +132,8 @@ var (
 		Name:      "http_retrieve_message_request_duration_seconds",
 		Help:      "Histogram of response time for retrieving a message in seconds",
 	}, []string{"route", "method"})
+	httpRequests = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:       "http_requests",
+		Help:       "Number of http requests",
+	})
 )
