@@ -3,6 +3,7 @@ package metrics
 import (
 	"fmt"
 	"time"
+	"strings"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
@@ -10,15 +11,19 @@ import (
 	cpu "github.com/shirou/gopsutil/cpu"
 )
 
+var bytes_to_gigabytes = float64(1073741824)
+
 func RecordMetrics() {
 	go func() {
 		prometheus.MustRegister(users)
 		prometheus.MustRegister(averageFollowers)
 		prometheus.MustRegister(averagePosts)
-		prometheus.MustRegister(memoryFree)
+		prometheus.MustRegister(memoryAvailable)
 		prometheus.MustRegister(memoryPercentage)
-		prometheus.MustRegister(memoryActive)
 		prometheus.MustRegister(cpuPercentage)
+		prometheus.MustRegister(responseTimeRegister)
+		prometheus.MustRegister(responseTimeSendMessage)
+		prometheus.MustRegister(responseTimeRetrieveMessage)
 		
 		for {
 			var numberOfUsers = float64(dto.GetTotalNumberOfUsers())
@@ -28,12 +33,9 @@ func RecordMetrics() {
 			averageFollowers.Set(numberOfFollowers/numberOfUsers)
 			averagePosts.Set(numberOfPosts/numberOfUsers)
 			v, _ := mem.VirtualMemory()
-
 			c,_ := cpu.Percent(0,false)
-
-			memoryFree.Set(float64(v.Free))
+			memoryAvailable.Set(float64(v.Available)/bytes_to_gigabytes)
 			memoryPercentage.Set(v.UsedPercent)
-			memoryActive.Set(float64(v.Active))
 			cpuPercentage.Set(c[0])
 			time.Sleep(60*60*time.Second)
 		}
@@ -49,6 +51,25 @@ func IncrementFollows() {
 func IncrementUnfollows() {
 	go func() {
 		unfollowed.Inc()
+	}()
+}
+
+func ResponseTimeHistogram(route string, method string, duration float64){
+	go func(){
+		switch {
+		case route == "/register":
+			responseTimeRegister.WithLabelValues(route, method).Observe(duration)
+			fmt.Println("Register")
+		case strings.Contains(route, "/msgs"):
+			switch method {
+			case "GET":
+				responseTimeRetrieveMessage.WithLabelValues(route, method).Observe(duration)
+				fmt.Println("Retrive messages")
+			case "POST":
+				responseTimeSendMessage.WithLabelValues(route, method).Observe(duration)
+				fmt.Println("Send message")
+			}
+		}
 	}()
 }
 
@@ -77,16 +98,25 @@ var (
 		Name:       "virtual_memory_percentage",
 		Help:       "Displays the proportion of the virtual memory being used",
 	})
-	memoryFree = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name:       "virtual_memory_free",
-		Help:       "Information about the amount of free virtual memory",
-	})
-	memoryActive = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name:       "virtual_memory_active",
-		Help:       "Information about the amount of active virtual memory",
+	memoryAvailable = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:       "virtual_memory_available",
+		Help:       "Information about the RAM available for programs to allocate in gigabytes",
 	})
 	cpuPercentage = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:       "cpu_total_percentage",
 		Help:       "Displays the proportion of the cpu being used",
 	})
+	//At some point we could maybe expand this to also look at the status code
+	responseTimeRegister = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:      "http_register_request_duration_seconds",
+		Help:      "Histogram of response time for registering a user in seconds",
+	}, []string{"route", "method"})
+	responseTimeSendMessage = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:      "http_send_message_request_duration_seconds",
+		Help:      "Histogram of response time for sending a message in seconds",
+	}, []string{"route", "method"})
+	responseTimeRetrieveMessage = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:      "http_retrieve_message_request_duration_seconds",
+		Help:      "Histogram of response time for retrieving a message in seconds",
+	}, []string{"route", "method"})
 )

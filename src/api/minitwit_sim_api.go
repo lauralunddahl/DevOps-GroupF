@@ -45,6 +45,7 @@ func Get_latest(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	update_latest(w, r)
 	err := ""
 	var newReg Register
@@ -77,6 +78,9 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		}
 	}
+	duration := time.Since(start)
+	route := r.URL.Path
+	metrics.ResponseTimeHistogram(route, r.Method, duration.Seconds())
 	json.NewEncoder(w).Encode(res)
 }
 
@@ -102,6 +106,7 @@ func Messages(w http.ResponseWriter, r *http.Request) {
 }
 
 func Messages_per_user(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	update_latest(w, r)
 	vars := mux.Vars(r)
 	username := vars["username"]
@@ -144,6 +149,10 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		json.NewEncoder(w).Encode(res)
 	}
+	duration := time.Since(start)
+	route := r.URL.Path
+	metrics.ResponseTimeHistogram(route, r.Method, duration.Seconds())
+
 }
 
 func Follow(w http.ResponseWriter, r *http.Request) {
