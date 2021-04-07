@@ -9,6 +9,7 @@ import (
 
 	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
@@ -182,6 +183,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 			} else {
 				dto.FollowUser(user_id, follows_user_id)
+				metrics.IncrementFollows()
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
@@ -199,6 +201,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 			} else {
 				dto.UnfollowUser(user_id, unfollows_user_id)
+				metrics.IncrementUnfollows()
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""

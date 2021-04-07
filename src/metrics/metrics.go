@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"fmt"
 	"time"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -34,7 +35,7 @@ func RecordMetrics() {
 			memoryPercentage.Set(v.UsedPercent)
 			memoryActive.Set(float64(v.Active))
 			cpuPercentage.Set(c[0])
-			time.Sleep(30*time.Second)
+			time.Sleep(60*60*time.Second)
 		}
 	}()
 }
