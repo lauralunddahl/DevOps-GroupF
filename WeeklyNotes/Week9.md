@@ -1,7 +1,10 @@
 ## Dependency diagram
 
+<img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/WeeklyNotes/Dependencies.png"/>
 
 http://www.webgraphviz.com/
+
+```
 digraph G {
   "travis.yml" -> "docker-compose.yml"
   "Dockerfile" -> "main.go"
@@ -36,3 +39,4 @@ digraph G {
   "Gorilla mux 1.8.0" -> "go compiler"
   "go compiler" -> "Ubuntu"
 }
+```
