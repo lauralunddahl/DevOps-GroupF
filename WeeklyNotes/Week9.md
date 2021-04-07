@@ -1,0 +1,38 @@
+## Dependency diagram
+
+
+http://www.webgraphviz.com/
+digraph G {
+  "travis.yml" -> "docker-compose.yml"
+  "Dockerfile" -> "main.go"
+  "docker-compose.yml" -> "grafana 4.5.2"
+  "docker-compose.yml" -> "prometheus"
+  "docker-compose.yml" -> "Dockerfile"
+  "docker-compose.yml" -> "filebeat 7.2.0"
+  "docker-compose.yml" -> "kibana 7.2.0"
+  "filebeat 7.2.0" -> "elasticsearch 7.2.0"
+  "kibana 7.2.0" -> "elasticsearch 7.2.0"
+  "main.go" -> "api/"
+  "main.go" -> "css/"
+  "main.go" -> "metrics/"
+  "main.go" -> "minitwit/"
+  "minitwit/" -> "templates/"
+  "templates/" -> "css/"
+  "api/" -> "db/"
+  "api/" -> "helper/"
+  "api/" -> "dto/"
+  "minitwit/" -> "db/"
+  "minitwit/" -> "helper/"
+  "minitwit/" -> "dto/"
+  "db/" -> "GORM 2.0"
+  "GORM 2.0" -> "mysql 1.5.0"
+  "metrics/" -> "prometheus"
+  "main.go" -> "Gorilla mux 1.8.0"
+  "minitwit/" -> "Gorilla mux 1.8.0"
+  "api/" -> "Gorilla mux 1.8.0"
+  "Dockerfile" -> "go.mod"
+  "Dockerfile" -> "go.sum"
+  "main.go" -> "go compiler"
+  "Gorilla mux 1.8.0" -> "go compiler"
+  "go compiler" -> "Ubuntu"
+}
