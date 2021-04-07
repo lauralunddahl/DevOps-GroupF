@@ -196,7 +196,6 @@ func Unfollow_user(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	username := vars["username"]
-
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		user_id = session.Values["userId"].(int)
