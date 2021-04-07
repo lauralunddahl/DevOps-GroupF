@@ -61,13 +61,16 @@ services:
         networks:
         - elknetwork
 
-    logstash:
-        image: "docker.elastic.co/logstash/logstash:7.2.0"
-        container_name: logstash
-        hostname: logstash
-        ports:
-        - "9600:9600"
-        - "8089:8089"
+    filebeat:
+        user: root
+        image: "docker.elastic.co/beats/filebeat:7.2.0"
+        container_name: filebeat
+        volumes:
+        - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+        - /var/lib/docker:/var/lib/docker:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+        depends_on:
+        - elasticsearch
         networks:
         - elknetwork
     
