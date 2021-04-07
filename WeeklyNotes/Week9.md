@@ -49,3 +49,6 @@ digraph G {
 - ELK (kibana + elasticsearch): Server Side Public License (SSPL) and the Elastic License (https://www.zdnet.com/article/elastic-changes-open-source-license-to-monetize-cloud-service-use/)
 - filebeat: Elastic License
 - crypto: Boost Software License (?) (https://github.com/golang/crypto/blob/master/LICENSE)
+- tawesoft dialog: The Unlicense (https://github.com/tawesoft/go/blob/master/dialog/LICENSE.txt)
+
+Due to ELK and firebeat having the SSPL license, which is based on the AGPL3 license (the strongest copyleft license), we must use the same license and therefore cannot choose to use e.g. the MIT license.
