@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
+	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
 
 	"github.com/gorilla/mux"
@@ -82,7 +82,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 	duration := time.Since(start)
 	route := r.URL.Path
-	metrics.ResponseTimeHistogram(route, r.Method, duration.Seconds())
+	metrics.ObserveResponseTime(route, r.Method, duration.Seconds())
 	json.NewEncoder(w).Encode(res)
 }
 
@@ -155,7 +155,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 	}
 	duration := time.Since(start)
 	route := r.URL.Path
-	metrics.ResponseTimeHistogram(route, r.Method, duration.Seconds())
+	metrics.ObserveResponseTime(route, r.Method, duration.Seconds())
 }
 
 func Follow(w http.ResponseWriter, r *http.Request) {
