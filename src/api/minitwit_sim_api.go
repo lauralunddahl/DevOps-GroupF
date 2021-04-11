@@ -9,6 +9,7 @@ import (
 
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
@@ -40,11 +41,14 @@ func Get_latest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var ls Latest
 	ls.Latest = latest
+	metrics.IncrementRequests()
 	json.NewEncoder(w).Encode(ls)
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	update_latest(w, r)
+	metrics.IncrementRequests()
 	err := ""
 	var newReg Register
 	json.NewDecoder(r.Body).Decode(&newReg)
@@ -76,11 +80,15 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		}
 	}
+	duration := time.Since(start)
+	route := r.URL.Path
+	metrics.ObserveResponseTime(route, r.Method, duration.Seconds())
 	json.NewEncoder(w).Encode(res)
 }
 
 func Messages(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
+	metrics.IncrementRequests()
 
 	//not_req_from_simulator(w, r)
 
@@ -101,7 +109,9 @@ func Messages(w http.ResponseWriter, r *http.Request) {
 }
 
 func Messages_per_user(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	update_latest(w, r)
+	metrics.IncrementRequests()
 	vars := mux.Vars(r)
 	username := vars["username"]
 
@@ -143,10 +153,14 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		json.NewEncoder(w).Encode(res)
 	}
+	duration := time.Since(start)
+	route := r.URL.Path
+	metrics.ObserveResponseTime(route, r.Method, duration.Seconds())
 }
 
 func Follow(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
+	metrics.IncrementRequests()
 
 	//not_req_from_simulator(w, r)
 	vars := mux.Vars(r)
@@ -182,6 +196,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 			} else {
 				dto.FollowUser(user_id, follows_user_id)
+				metrics.IncrementFollows()
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
@@ -199,6 +214,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 			} else {
 				dto.UnfollowUser(user_id, unfollows_user_id)
+				metrics.IncrementUnfollows()
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
