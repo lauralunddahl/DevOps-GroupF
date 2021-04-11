@@ -34,7 +34,7 @@ func GetFollowers(who_id int, limit int) []Follower {
 
 func UnfollowUser(who_id int, whom_id int) {
 	follower := getFollower(who_id, whom_id)
-	result := database.DB.Delete(&follower)
+	result := database.DB.Where("who_id = ? and whom_id = ?", who_id, whom_id).Delete(&follower)
 	if result.Error != nil {
 		print(result.Error)
 	}
