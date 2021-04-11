@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
+	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
