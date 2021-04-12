@@ -78,8 +78,6 @@ func Messages(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	metrics.IncrementRequests()
 
-	//not_req_from_simulator(w, r)
-
 	no_msg := r.URL.Query().Get("no")
 	if no_msg == "" {
 		no_msg = "100"
@@ -102,8 +100,6 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 	metrics.IncrementRequests()
 	vars := mux.Vars(r)
 	username := vars["username"]
-
-	//not_req_from_simulator(w, r)
 
 	no_msg := r.URL.Query().Get("no")
 	if no_msg == "" {
@@ -150,7 +146,6 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
 	metrics.IncrementRequests()
 
-	//not_req_from_simulator(w, r)
 	vars := mux.Vars(r)
 	username := vars["username"]
 
