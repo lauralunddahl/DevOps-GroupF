@@ -23,9 +23,9 @@ output.elasticsearch:
               container.image.name: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
           - equals:
               container.image.name: docker.elastic.co/kibana/kibana:7.2.0
-      - index: "filebeat-devops-%{[agent.version]}-%{+yyyy.MM.dd}"
+      - index: "filebeat-minitwit-%{[agent.version]}-%{+yyyy.MM.dd}"
         when.equals:
-          container.image.name: nannamarcher/minitwitimage
+          container.image.name: nannamarcher/minitwitimage:latest
 
 setup.ilm.enabled: false
 logging.json: true
