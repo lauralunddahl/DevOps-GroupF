@@ -76,7 +76,6 @@ func databaseMetrics() {
 			users.Set(numberOfUsers)
 			averageFollowers.Set(numberOfFollowers / numberOfUsers)
 			averagePosts.Set(numberOfPosts / numberOfUsers)
-			//fmt.Println("Number of users and average of followers and posts")
 			time.Sleep(interval * time.Second)
 		}
 	}()
@@ -92,7 +91,6 @@ func cpuMetric() {
 		for {
 			c, _ := cpu.Percent(0, false)
 			cpuPercentage.Set(c[0])
-			//fmt.Println("CPU")
 			time.Sleep(interval * time.Second)
 		}
 	}()
@@ -115,7 +113,6 @@ func virtualMemoryMetrics() {
 			v, _ := mem.VirtualMemory()
 			memoryAvailable.Set(float64(v.Available) / bytes_to_gigabytes)
 			memoryPercentage.Set(v.UsedPercent)
-			//fmt.Println("Virtual Memory")
 			time.Sleep(interval * time.Second)
 		}
 	}()
@@ -129,53 +126,26 @@ func responseTimeMetrics() {
 
 func IncrementFollows() {
 	followed.Inc()
-	//fmt.Println("Followed incremented")
 }
 
 func IncrementUnfollows() {
 	unfollowed.Inc()
-	//fmt.Println("Unfollowed incremented")
 }
 
 func IncrementRequests() {
 	httpRequests.Inc()
-	//fmt.Println("HTTP requests incremented")
 }
 
 func ObserveResponseTime(route string, method string, duration float64) {
 	switch {
 	case route == "/register":
 		responseTimeRegister.Observe(duration)
-		//fmt.Println("Register")
 	case strings.Contains(route, "/msgs"):
 		switch method {
 		case "GET":
 			responseTimeRetrieveMessage.Observe(duration)
-			//fmt.Println("Retrive messages")
 		case "POST":
 			responseTimeSendMessage.Observe(duration)
-			//fmt.Println("Send message")
 		}
 	}
 }
-
-// func getCounterOpts(name string, help string) prometheus.CounterOpts {
-// 	return prometheus.CounterOpts{
-// 		Name: name,
-// 		Help: help,
-// 	}
-// }
-
-// func getHistogramOpts(name string, help string) prometheus.HistogramOpts {
-// 	return prometheus.HistogramOpts{
-// 		Name: name,
-// 		Help: help,
-// 	}
-// }
-
-// func getGaugeOpts(name string, help string) prometheus.GaugeOpts {
-// 	return prometheus.GaugeOpts{
-// 		Name: name,
-// 		Help: help,
-// 	}
-// }
