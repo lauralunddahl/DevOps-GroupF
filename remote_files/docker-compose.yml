@@ -83,3 +83,4 @@ networks:
 
 volumes:
   grafana-storage:
+  elk_elasticsearch_data:
