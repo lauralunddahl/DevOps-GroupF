@@ -227,10 +227,9 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNoContent)
 				json.NewEncoder(w).Encode(res)
 			}
+		case "GET":
+			numb, _ := strconv.Atoi(no_followers)
+			var followers = dto.GetFollowers(user_id, numb)
+			json.NewEncoder(w).Encode(followers)
 		}
-	case "GET":
-		numb, _ := strconv.Atoi(no_followers)
-		var followers = dto.GetFollowers(user_id, numb)
-		json.NewEncoder(w).Encode(followers)
 	}
-}
