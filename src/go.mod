@@ -13,6 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/prometheus/client_golang v1.10.0
 	github.com/shirou/gopsutil v3.21.2+incompatible
+	github.com/sirupsen/logrus v1.8.1
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/yosssi/gohtml v0.0.0-20201013000340-ee4748c638f4 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
