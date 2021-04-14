@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
+	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
@@ -40,11 +41,14 @@ func Get_latest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var ls Latest
 	ls.Latest = latest
+	metrics.IncrementRequests()
 	json.NewEncoder(w).Encode(ls)
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	update_latest(w, r)
+	metrics.IncrementRequests()
 	err := ""
 	var newReg Register
 	json.NewDecoder(r.Body).Decode(&newReg)
@@ -76,11 +80,15 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		}
 	}
+	duration := time.Since(start)
+	route := r.URL.Path
+	metrics.ObserveResponseTime(route, r.Method, duration.Seconds())
 	json.NewEncoder(w).Encode(res)
 }
 
 func Messages(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
+	metrics.IncrementRequests()
 
 	//not_req_from_simulator(w, r)
 
@@ -101,7 +109,9 @@ func Messages(w http.ResponseWriter, r *http.Request) {
 }
 
 func Messages_per_user(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	update_latest(w, r)
+	metrics.IncrementRequests()
 	vars := mux.Vars(r)
 	username := vars["username"]
 
@@ -112,15 +122,15 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		no_msg = "100"
 	}
 
-	switch r.Method {
-	case "GET":
-		user_id := dto.GetUserID(username)
-		if user_id == 0 {
-			var res Response
-			res.Status = 404
-			res.ErrorMsg = "No user found for " + username
-			json.NewEncoder(w).Encode(res)
-		} else {
+	user_id := dto.GetUserID(username)
+	if user_id == 0 {
+		var res Response
+		res.Status = 404
+		res.ErrorMsg = "No user found for " + username
+		json.NewEncoder(w).Encode(res)
+	} else {
+		switch r.Method {
+		case "GET":
 			var timelines = dto.GetUserTimeline(user_id) //update to no_msg
 			var messages []ApiMessage
 			for _, t := range timelines {
@@ -131,22 +141,25 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 				messages = append(messages, message)
 			}
 			json.NewEncoder(w).Encode(messages)
-		}
-	case "POST":
-		user_id := dto.GetUserID(username)
-		var message ApiMessage
-		json.NewDecoder(r.Body).Decode(&message)
-		dto.AddMessage(strconv.Itoa(user_id), message.Content, time.Now(), 0)
-		var res Response
-		res.Status = 204
-		res.ErrorMsg = ""
-		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
-		json.NewEncoder(w).Encode(res)
+		case "POST":
+			var message ApiMessage
+			json.NewDecoder(r.Body).Decode(&message)
+			dto.AddMessage(strconv.Itoa(user_id), message.Content, time.Now(), 0)
+			var res Response
+			res.Status = 204
+			res.ErrorMsg = ""
+			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+			json.NewEncoder(w).Encode(res)
+		}	
 	}
+	duration := time.Since(start)
+	route := r.URL.Path
+	metrics.ObserveResponseTime(route, r.Method, duration.Seconds())
 }
 
 func Follow(w http.ResponseWriter, r *http.Request) {
 	update_latest(w, r)
+	metrics.IncrementRequests()
 
 	//not_req_from_simulator(w, r)
 	vars := mux.Vars(r)
@@ -164,51 +177,53 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 		res.ErrorMsg = "No user found"
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		json.NewEncoder(w).Encode(res)
-	}
-
-	switch r.Method {
-	case "POST":
-		w.Header().Set("Content-Type", "application/json")
-		var follows FollowUser
-		json.NewDecoder(r.Body).Decode(&follows)
-		if len(follows.Follow) > 0 {
-			follows_username := follows.Follow
-			follows_user_id := dto.GetUserID(follows_username)
-			if follows_user_id == 0 {
-				var res Response
-				res.Status = 404
-				res.ErrorMsg = "No user found"
-				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-				json.NewEncoder(w).Encode(res)
-			} else {
-				dto.FollowUser(user_id, follows_user_id)
-				var res Response
-				res.Status = 204
-				res.ErrorMsg = ""
-				http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
-				json.NewEncoder(w).Encode(res)
+	} else {
+		switch r.Method {
+		case "POST":
+			w.Header().Set("Content-Type", "application/json")
+			var follows FollowUser
+			json.NewDecoder(r.Body).Decode(&follows)
+			if len(follows.Follow) > 0 {
+				follows_username := follows.Follow
+				follows_user_id := dto.GetUserID(follows_username)
+				if follows_user_id == 0 {
+					var res Response
+					res.Status = 404
+					res.ErrorMsg = "No user found"
+					http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+					json.NewEncoder(w).Encode(res)
+				} else {
+					dto.FollowUser(user_id, follows_user_id)
+					metrics.IncrementFollows()
+					var res Response
+					res.Status = 204
+					res.ErrorMsg = ""
+					http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+					json.NewEncoder(w).Encode(res)
+				}
+			} else if len(follows.Unfollow) > 0 {
+				unfollows_username := follows.Unfollow
+				unfollows_user_id := dto.GetUserID(unfollows_username)
+				if unfollows_user_id == 0 {
+					var res Response
+					res.Status = 404
+					res.ErrorMsg = "No user found"
+					http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+					json.NewEncoder(w).Encode(res)
+				} else {
+					dto.UnfollowUser(user_id, unfollows_user_id)
+					metrics.IncrementUnfollows()
+					var res Response
+					res.Status = 204
+					res.ErrorMsg = ""
+					http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+					json.NewEncoder(w).Encode(res)
+				}
 			}
-		} else if len(follows.Unfollow) > 0 {
-			unfollows_username := follows.Unfollow
-			unfollows_user_id := dto.GetUserID(unfollows_username)
-			if user_id == 0 {
-				var res Response
-				res.Status = 404
-				res.ErrorMsg = "No user found"
-				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-				json.NewEncoder(w).Encode(res)
-			} else {
-				dto.UnfollowUser(user_id, unfollows_user_id)
-				var res Response
-				res.Status = 204
-				res.ErrorMsg = ""
-				http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
-				json.NewEncoder(w).Encode(res)
-			}
+		case "GET":
+			numb, _ := strconv.Atoi(no_followers)
+			var followers = dto.GetFollowers(user_id, numb)
+			json.NewEncoder(w).Encode(followers)
 		}
-	case "GET":
-		numb, _ := strconv.Atoi(no_followers)
-		var followers = dto.GetFollowers(user_id, numb)
-		json.NewEncoder(w).Encode(followers)
 	}
 }
