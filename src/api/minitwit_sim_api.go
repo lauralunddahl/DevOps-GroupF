@@ -79,6 +79,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 			dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash), image)
 			res.Status = 204
 			res.ErrorMsg = ""
+			w.WriteHeader(http.StatusNoContent)
 		}
 	}
 	duration := time.Since(start)
@@ -152,6 +153,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		var res Response
 		res.Status = 204
 		res.ErrorMsg = ""
+		w.WriteHeader(http.StatusNoContent)
 		json.NewEncoder(w).Encode(res)
 	}
 	duration := time.Since(start)
@@ -203,6 +205,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
+				w.WriteHeader(http.StatusNoContent)
 				json.NewEncoder(w).Encode(res)
 			}
 		} else if len(follows.Unfollow) > 0 {
@@ -221,6 +224,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
+				w.WriteHeader(http.StatusNoContent)
 				json.NewEncoder(w).Encode(res)
 			}
 		}
