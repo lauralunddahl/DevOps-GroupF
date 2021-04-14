@@ -40,8 +40,8 @@ func UnfollowUser(who_id int, whom_id int) {
 	}
 }
 
-func GetTotalNumberOfFollowerEntries() int {
-	var result int
+func GetTotalNumberOfFollowerEntries() int64 {
+	var result int64
 	database.DB.Table("followers").Count(&result)
 	return result
 }

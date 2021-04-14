@@ -6,7 +6,6 @@ import (
 
 	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
 
-	"github.com/jinzhu/gorm"
 )
 
 type Timeline struct {
@@ -23,7 +22,7 @@ type Timeline struct {
 	Flagged   int
 }
 
-var db *gorm.DB = database.DB
+var db = database.DB
 var per_page = 30
 
 func GetPrivateTimeline(user_id int) []Timeline {

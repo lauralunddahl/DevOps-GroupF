@@ -3,9 +3,10 @@ package db
 import (
 	"fmt"
 	"os"
+	"gorm.io/gorm"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -17,10 +18,9 @@ func init() {
 		fmt.Println("Not running locally")
 	}
 	password := os.Getenv("DB_PASSWORD")
-
-	database, err := gorm.Open("mysql", "fibonacci:"+password+"@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local")
-	//database, err := gorm.Open("mysql", "**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local")
-	//defer db.Close()
+	database, err := gorm.Open(mysql.Open("fibonacci:"+password+"@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local"))
+	//database, err := gorm.Open(mysql.Open("**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local"))
+  
 	if err != nil {
 		fmt.Println(err)
 		panic("Failed to connect to the database!")
