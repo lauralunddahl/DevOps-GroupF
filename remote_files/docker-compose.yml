@@ -36,9 +36,51 @@ services:
         - minitwit
         volumes:
         - grafana-storage:/var/lib/grafana
+    
+    elasticsearch:
+        image: "docker.elastic.co/elasticsearch/elasticsearch:7.2.0"
+        container_name: elasticsearch
+        volumes:
+        - elk_elasticsearch_data:/usr/share/elasticsearch/data
+        environment:
+        - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+        - "discovery.type=single-node"
+        ports:
+        - "9200:9200"
+        - "9300:9300"
+        networks:
+        - elknetwork
 
-networks: 
+    kibana:
+        image: "docker.elastic.co/kibana/kibana:7.2.0"
+        container_name: kibana
+        ports:
+        - "5601:5601"
+        environment:
+            elasticsearch.hosts: '["http://elasticsearch:9200"]'
+        depends_on:
+        - elasticsearch
+        networks:
+        - elknetwork
+
+    filebeat:
+        user: root
+        image: "docker.elastic.co/beats/filebeat:7.2.0"
+        container_name: filebeat
+        volumes:
+        - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+        - /var/lib/docker:/var/lib/docker:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+        depends_on:
+        - elasticsearch
+        networks:
+        - elknetwork
+    
+networks:
     minitwit:
+    elknetwork:
+        driver: bridge
 
 volumes:
   grafana-storage:
+  elk_elasticsearch_data:

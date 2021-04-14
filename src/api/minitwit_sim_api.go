@@ -10,6 +10,7 @@ import (
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
@@ -68,6 +69,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		res.Status = 400
 		res.ErrorMsg = err
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		log.Info(http.StatusText(http.StatusBadRequest))
 	} else {
 		pw_hash, err := bcrypt.GenerateFromPassword([]byte(newReg.Password), bcrypt.MinCost)
 		if err != nil {
@@ -77,7 +79,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 			dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash), image)
 			res.Status = 204
 			res.ErrorMsg = ""
-			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+			w.WriteHeader(http.StatusNoContent)
 		}
 	}
 	duration := time.Since(start)
@@ -130,6 +132,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 			res.Status = 404
 			res.ErrorMsg = "No user found for " + username
 			json.NewEncoder(w).Encode(res)
+			log.Info("User id for user "+username+" was not found")
 		} else {
 			var timelines = dto.GetUserTimeline(user_id) //update to no_msg
 			var messages []ApiMessage
@@ -150,7 +153,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 		var res Response
 		res.Status = 204
 		res.ErrorMsg = ""
-		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+		w.WriteHeader(http.StatusNoContent)
 		json.NewEncoder(w).Encode(res)
 	}
 	duration := time.Since(start)
@@ -178,6 +181,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 		res.ErrorMsg = "No user found"
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		json.NewEncoder(w).Encode(res)
+		log.Info("User id for user "+username+" was not found")
 	}
 
 	switch r.Method {
@@ -194,13 +198,14 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				res.ErrorMsg = "No user found"
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
+				log.Info("User id for user to follow "+follows_username+" was not found")
 			} else {
 				dto.FollowUser(user_id, follows_user_id)
 				metrics.IncrementFollows()
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
-				http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+				w.WriteHeader(http.StatusNoContent)
 				json.NewEncoder(w).Encode(res)
 			}
 		} else if len(follows.Unfollow) > 0 {
@@ -212,19 +217,20 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				res.ErrorMsg = "No user found"
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
+				log.Info("User id for user to unfollow "+unfollows_username+" was not found")
 			} else {
 				dto.UnfollowUser(user_id, unfollows_user_id)
 				metrics.IncrementUnfollows()
 				var res Response
 				res.Status = 204
 				res.ErrorMsg = ""
-				http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+				w.WriteHeader(http.StatusNoContent)
 				json.NewEncoder(w).Encode(res)
 			}
 		}
-	case "GET":
-		numb, _ := strconv.Atoi(no_followers)
-		var followers = dto.GetFollowers(user_id, numb)
-		json.NewEncoder(w).Encode(followers)
+		case "GET":
+			numb, _ := strconv.Atoi(no_followers)
+			var followers = dto.GetFollowers(user_id, numb)
+			json.NewEncoder(w).Encode(followers)
+		}
 	}
-}

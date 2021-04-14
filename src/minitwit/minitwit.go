@@ -11,7 +11,7 @@ import (
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
@@ -228,6 +228,7 @@ func Add_message(w http.ResponseWriter, r *http.Request) {
 		dto.AddMessage(strconv.Itoa(user_id), text, time.Now(), 0)
 		dialog.Alert("Your message was recorded")
 		http.Redirect(w, r, "/", 302)
+		log.Println("message recorded")
 	}
 }
 
