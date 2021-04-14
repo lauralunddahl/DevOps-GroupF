@@ -1,6 +1,9 @@
 package dto
 
-import database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+import (
+	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+	log "github.com/sirupsen/logrus"
+)
 
 type Follower struct {
 	WhoId  int
@@ -16,7 +19,7 @@ func FollowUser(who_id int, whom_id int) {
 	follower := Follower{WhoId: who_id, WhomId: whom_id}
 	result := database.DB.Create(&follower)
 	if result.Error != nil {
-		print(result.Error)
+		log.Error(result.Error)
 	}
 }
 
@@ -36,7 +39,7 @@ func UnfollowUser(who_id int, whom_id int) {
 	follower := getFollower(who_id, whom_id)
 	result := database.DB.Where("who_id = ? and whom_id = ?", who_id, whom_id).Delete(&follower)
 	if result.Error != nil {
-		print(result.Error)
+		log.Error(result.Error)
 	}
 }
 

@@ -1,6 +1,9 @@
 package dto
 
-import database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+import (
+	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+	log "github.com/sirupsen/logrus"
+)
 
 type User struct {
 	UserId   int
@@ -38,7 +41,7 @@ func RegisterUser(username string, email string, password string, image string) 
 	user := User{Username: username, Email: email, PwHash: password, Image: image}
 	result := database.DB.Create(&user)
 	if result.Error != nil {
-		print(result.Error)
+		log.Error(result.Error)
 	}
 }
 

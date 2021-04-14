@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"fmt"
+	//"fmt"
 	"strings"
 	"time"
 
@@ -105,7 +105,7 @@ func IncrementUnfollows() {
 
 func IncrementRequests() {
 	//httpRequests.Inc()
-	fmt.Println("HTTP requests incremented")
+	//fmt.Println("HTTP requests incremented")
 }
 
 func ObserveResponseTime(route string, method string, duration float64) {

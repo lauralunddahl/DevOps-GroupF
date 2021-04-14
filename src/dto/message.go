@@ -4,6 +4,7 @@ import (
 	"time"
 
 	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+	log "github.com/sirupsen/logrus"
 )
 
 type Message struct {
@@ -18,7 +19,7 @@ func AddMessage(author_id string, text string, pub_date time.Time, flagged int) 
 	message := Message{AuthorId: author_id, Text: text, PubDate: pub_date, Flagged: flagged}
 	result := database.DB.Create(&message)
 	if result.Error != nil {
-		print(result.Error)
+		log.Error(result.Error)
 	}
 }
 
