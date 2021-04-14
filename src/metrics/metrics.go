@@ -66,17 +66,25 @@ var responseTimeRetrieveMessage = prometheus.NewHistogram(prometheus.HistogramOp
 })
 
 func RecordMetrics() {
+	registerMetrics()
 	databaseMetrics()
 	cpuMetric()
 	virtualMemoryMetrics()
-	responseTimeMetrics()
 }
 
-func databaseMetrics() {
+func registerMetrics() {
 	prometheus.MustRegister(users)
 	prometheus.MustRegister(averageFollowers)
 	prometheus.MustRegister(averagePosts)
+	prometheus.MustRegister(cpuPercentage)
+	prometheus.MustRegister(memoryPercentage)
+	prometheus.MustRegister(memoryAvailable)
+	prometheus.MustRegister(responseTimeRegister)
+	prometheus.MustRegister(responseTimeSendMessage)
+	prometheus.MustRegister(responseTimeRetrieveMessage)
+}
 
+func databaseMetrics() {
 	go func() {
 		for {
 			var numberOfUsers = float64(dto.GetTotalNumberOfUsers())
@@ -92,7 +100,6 @@ func databaseMetrics() {
 }
 
 func cpuMetric() {
-	prometheus.MustRegister(cpuPercentage)
 	go func() {
 		for {
 			c, _ := cpu.Percent(0, false)
@@ -103,8 +110,6 @@ func cpuMetric() {
 }
 
 func virtualMemoryMetrics() {
-	prometheus.MustRegister(memoryPercentage)
-	prometheus.MustRegister(memoryAvailable)
 	go func() {
 		for {
 			v, _ := mem.VirtualMemory()
@@ -113,12 +118,6 @@ func virtualMemoryMetrics() {
 			time.Sleep(interval * time.Second)
 		}
 	}()
-}
-
-func responseTimeMetrics() {
-	prometheus.MustRegister(responseTimeRegister)
-	prometheus.MustRegister(responseTimeSendMessage)
-	prometheus.MustRegister(responseTimeRetrieveMessage)
 }
 
 func IncrementFollows() {
