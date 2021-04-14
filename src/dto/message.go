@@ -25,8 +25,8 @@ func AddMessage(author_id string, text string, pub_date time.Time, flagged int) 
 }
 
 
-func GetTotalNumberOfMessages() int {
-	var result int
+func GetTotalNumberOfMessages() int64 {
+	var result int64
 	database.DB.Table("messages").Count(&result)
 	return result
 }
