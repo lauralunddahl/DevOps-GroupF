@@ -28,6 +28,30 @@ var httpRequests = promauto.NewCounter(prometheus.CounterOpts{
 	Name: "http_requests",
 	Help: "Number of http requests",
 })
+var users = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "users_registered",
+	Help: "Total number of users registered",
+})
+var averageFollowers = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "average_followers_per_user",
+	Help: "Number of average followers per user",
+})
+var averagePosts = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "average_posts_per_user",
+	Help: "Number of average posts per user",
+})
+var cpuPercentage = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "cpu_total_percentage",
+	Help: "Displays the proportion of the cpu being used",
+})
+var memoryPercentage = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "virtual_memory_percentage",
+	Help: "Displays the proportion of the virtual memory being used",
+})
+var memoryAvailable = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "virtual_memory_available",
+	Help: "Information about the RAM available for programs to allocate in gigabytes",
+})
 var responseTimeRegister = prometheus.NewHistogram(prometheus.HistogramOpts{
 	Name: "http_register_request_duration_seconds",
 	Help: "Histogram of response time for registering a user in seconds",
@@ -49,22 +73,8 @@ func RecordMetrics() {
 }
 
 func databaseMetrics() {
-	users := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "users_registered",
-		Help: "Total number of users registered",
-	})
 	prometheus.MustRegister(users)
-
-	averageFollowers := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "average_followers_per_user",
-		Help: "Number of average followers per user",
-	})
 	prometheus.MustRegister(averageFollowers)
-
-	averagePosts := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "average_posts_per_user",
-		Help: "Number of average posts per user",
-	})
 	prometheus.MustRegister(averagePosts)
 
 	go func() {
@@ -82,10 +92,6 @@ func databaseMetrics() {
 }
 
 func cpuMetric() {
-	cpuPercentage := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "cpu_total_percentage",
-		Help: "Displays the proportion of the cpu being used",
-	})
 	prometheus.MustRegister(cpuPercentage)
 	go func() {
 		for {
@@ -97,16 +103,7 @@ func cpuMetric() {
 }
 
 func virtualMemoryMetrics() {
-	memoryPercentage := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "virtual_memory_percentage",
-		Help: "Displays the proportion of the virtual memory being used",
-	})
 	prometheus.MustRegister(memoryPercentage)
-
-	memoryAvailable := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "virtual_memory_available",
-		Help: "Information about the RAM available for programs to allocate in gigabytes",
-	})
 	prometheus.MustRegister(memoryAvailable)
 	go func() {
 		for {
