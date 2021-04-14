@@ -11,7 +11,6 @@ import (
 	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
 	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
-
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"

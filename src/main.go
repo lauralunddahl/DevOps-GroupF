@@ -8,6 +8,7 @@ import (
 	api "github.com/lauralunddahl/DevOps-GroupF/src/api"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
 	minitwit "github.com/lauralunddahl/DevOps-GroupF/src/minitwit"
+	logging "github.com/lauralunddahl/DevOps-GroupF/src/logging"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -39,7 +40,8 @@ func main() {
 	router.HandleFunc("/{username}", minitwit.User_timeline).Methods("GET")
 	router.HandleFunc("/{username}/follow", minitwit.Follow_user)
 	router.HandleFunc("/{username}/unfollow", minitwit.Unfollow_user)
-
+	logging.Logging()
+	
 	go func() { log.Fatal(http.ListenAndServe(":8081", apirouter)) }()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
