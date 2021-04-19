@@ -59,7 +59,6 @@ services:
         environment:
             elasticsearch.hosts: '["http://elasticsearch:9200"]'
             server.host: "0.0.0.0"
-            - ELASTICSEARCH_URL=http://0.0.0.0:9200
         depends_on:
         - elasticsearch
         networks:
