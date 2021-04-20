@@ -5,16 +5,14 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	api "github.com/lauralunddahl/DevOps-GroupF/src/api"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
-	minitwit "github.com/lauralunddahl/DevOps-GroupF/src/minitwit"
-	logging "github.com/lauralunddahl/DevOps-GroupF/src/logging"
+	logging "github.com/lauralunddahl/DevOps-GroupF/src/program/logging"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/src/program/metrics"
+	minitwit "github.com/lauralunddahl/DevOps-GroupF/src/program/minitwit"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
 	router := mux.NewRouter()
-	apirouter := mux.NewRouter()
 
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
@@ -28,12 +26,6 @@ func main() {
 	router.HandleFunc("/add_message", minitwit.Add_message).Methods("POST")
 	router.HandleFunc("/logout", minitwit.Logout)
 
-	apirouter.HandleFunc("/latest", api.Get_latest).Methods("GET")
-	apirouter.HandleFunc("/register", api.RegisterUser).Methods("POST")
-	apirouter.HandleFunc("/msgs", api.Messages).Methods("GET")
-	apirouter.HandleFunc("/fllws/{username}", api.Follow).Methods("GET", "POST")
-	apirouter.HandleFunc("/msgs/{username}", api.Messages_per_user).Methods("GET", "POST")
-
 	metrics.RecordMetrics()
 	router.Handle("/metrics", promhttp.Handler())
 
@@ -41,8 +33,6 @@ func main() {
 	router.HandleFunc("/{username}/follow", minitwit.Follow_user)
 	router.HandleFunc("/{username}/unfollow", minitwit.Unfollow_user)
 	logging.Logging()
-	
-	go func() { log.Fatal(http.ListenAndServe(":8081", apirouter)) }()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

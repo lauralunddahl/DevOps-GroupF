@@ -173,6 +173,7 @@ github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFB
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
+github.com/lauralunddahl/DevOps-GroupF v0.0.0-20210414113052-da5a7c42b33a h1:bIPR+2tQUuELE/DvSPVEBv2lBKqqT5q4j7FjISqMhhM=
 github.com/lauralunddahl/DevOps-GroupF/src v0.0.0-20210224133013-9d659aaea05a h1:JzXQ3xwSfbpXapIk0v2FR35gj6vS5HQzKNCs3ylVnv8=
 github.com/lauralunddahl/DevOps-GroupF/src v0.0.0-20210224133013-9d659aaea05a/go.mod h1:11zFezuDOG5+Y/sRLx8uwMi92rhco9NoIkbC4NK2bg0=
 github.com/lib/pq v1.1.1/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
