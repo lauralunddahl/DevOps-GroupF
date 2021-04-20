@@ -22,5 +22,5 @@ func main() {
 	metrics.RecordMetrics()
 	logging.Logging()
 
-	go func() { log.Fatal(http.ListenAndServe(":8081", apirouter)) }()
+	log.Fatal(http.ListenAndServe(":8081", apirouter))
 }

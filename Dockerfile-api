@@ -4,7 +4,7 @@ FROM golang:latest
 
 WORKDIR ./src
 
-COPY ./src .
+COPY ./src/api .
 
 COPY ./src/go.mod .
 COPY ./src/go.sum .
@@ -12,6 +12,6 @@ RUN go mod download
 
 RUN GOOS=linux go build -o ./out/minitwit
 
-EXPOSE 8080 8081
+EXPOSE 8081
 
-CMD ["./out/minitwit"]
+CMD ["./out/minitwit-api"]
