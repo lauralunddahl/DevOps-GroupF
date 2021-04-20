@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"encoding/json"
@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
+	dto "github.com/lauralunddahl/DevOps-GroupF/src/program/dto"
+	helper "github.com/lauralunddahl/DevOps-GroupF/src/program/helper"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/src/program/metrics"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
@@ -132,7 +132,7 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 			res.Status = 404
 			res.ErrorMsg = "No user found for " + username
 			json.NewEncoder(w).Encode(res)
-			log.Info("User id for user "+username+" was not found")
+			log.Info("User id for user " + username + " was not found")
 		} else {
 			var timelines = dto.GetUserTimeline(user_id) //update to no_msg
 			var messages []ApiMessage
@@ -181,7 +181,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 		res.ErrorMsg = "No user found"
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		json.NewEncoder(w).Encode(res)
-		log.Info("User id for user "+username+" was not found")
+		log.Info("User id for user " + username + " was not found")
 	}
 
 	switch r.Method {
@@ -198,7 +198,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				res.ErrorMsg = "No user found"
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
-				log.Info("User id for user to follow "+follows_username+" was not found")
+				log.Info("User id for user to follow " + follows_username + " was not found")
 			} else {
 				dto.FollowUser(user_id, follows_user_id)
 				metrics.IncrementFollows()
@@ -217,7 +217,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				res.ErrorMsg = "No user found"
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
-				log.Info("User id for user to unfollow "+unfollows_username+" was not found")
+				log.Info("User id for user to unfollow " + unfollows_username + " was not found")
 			} else {
 				dto.UnfollowUser(user_id, unfollows_user_id)
 				metrics.IncrementUnfollows()
@@ -228,9 +228,9 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 			}
 		}
-		case "GET":
-			numb, _ := strconv.Atoi(no_followers)
-			var followers = dto.GetFollowers(user_id, numb)
-			json.NewEncoder(w).Encode(followers)
-		}
+	case "GET":
+		numb, _ := strconv.Atoi(no_followers)
+		var followers = dto.GetFollowers(user_id, numb)
+		json.NewEncoder(w).Encode(followers)
 	}
+}
