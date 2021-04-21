@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import "time"
 
@@ -51,4 +51,12 @@ type Followers struct {
 type FollowUser struct {
 	Follow   string `json:"follow"`
 	Unfollow string `json:"unfollow"`
+}
+
+type User struct {
+	UserId   int
+	Username string
+	Email    string
+	PwHash   string
+	Image    string
 }

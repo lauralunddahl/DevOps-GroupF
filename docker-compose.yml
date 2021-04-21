@@ -3,9 +3,21 @@ services:
     minitwit:
         image: nannamarcher/minitwitimage:latest
         container_name: minitwit_container
-        build: .
+        build:
+            context: .
+            dockerfile: Dockerfile-program
         ports:
             - "8080:8080"
+        restart: always
+        networks:
+            - minitwit
+    minitwit-api:
+        image: nannamarcher/minitwitapi:latest
+        container_name: minitwit_api
+        build: 
+            context: .
+            dockerfile: Dockerfile-api
+        ports:
             - "8081:8081"
         restart: always
         networks:

@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"encoding/json"
@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
+	dto "github.com/lauralunddahl/DevOps-GroupF/api/dto"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/api/metrics"
+	helper "github.com/lauralunddahl/DevOps-GroupF/api/helper"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
@@ -17,20 +17,9 @@ import (
 )
 
 var latest = 0
+var noUserFound = "No user found"
 
-func not_req_from_simulator(w http.ResponseWriter, r *http.Request) {
-	fromSim := r.Header.Get("Authorization")
-	w.Header().Set("Content-Type", "application/json")
-	if fromSim != "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh" {
-		err := "You are not authorized to use this resource!"
-		var res Response
-		res.Status = 403
-		res.ErrorMsg = err
-		json.NewEncoder(w).Encode(res)
-	}
-}
-
-func update_latest(w http.ResponseWriter, r *http.Request) int {
+func updateLatest(w http.ResponseWriter, r *http.Request) int {
 	late, _ := strconv.Atoi(r.URL.Query().Get("latest"))
 	if late != 0 {
 		latest = late
@@ -38,7 +27,7 @@ func update_latest(w http.ResponseWriter, r *http.Request) int {
 	return latest
 }
 
-func Get_latest(w http.ResponseWriter, r *http.Request) {
+func GetLatest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var ls Latest
 	ls.Latest = latest
@@ -48,7 +37,7 @@ func Get_latest(w http.ResponseWriter, r *http.Request) {
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
-	update_latest(w, r)
+	updateLatest(w, r)
 	metrics.IncrementRequests()
 	err := ""
 	var newReg Register
@@ -71,12 +60,12 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		log.Info(http.StatusText(http.StatusBadRequest))
 	} else {
-		pw_hash, err := bcrypt.GenerateFromPassword([]byte(newReg.Password), bcrypt.MinCost)
+		pwHash, err := bcrypt.GenerateFromPassword([]byte(newReg.Password), bcrypt.MinCost)
 		if err != nil {
 			println(err.Error())
 		} else {
-			image := helper.Gravatar_url(newReg.Email)
-			dto.RegisterUser(newReg.Username, newReg.Email, string(pw_hash), image)
+			image := helper.GravatarUrl(newReg.Email)
+			dto.RegisterUser(newReg.Username, newReg.Email, string(pwHash), image)
 			res.Status = 204
 			res.ErrorMsg = ""
 			w.WriteHeader(http.StatusNoContent)
@@ -89,16 +78,14 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func Messages(w http.ResponseWriter, r *http.Request) {
-	update_latest(w, r)
+	updateLatest(w, r)
 	metrics.IncrementRequests()
 
-	//not_req_from_simulator(w, r)
-
-	no_msg := r.URL.Query().Get("no")
-	if no_msg == "" {
-		no_msg = "100"
+	noMsg := r.URL.Query().Get("no")
+	if noMsg == "" {
+		noMsg = "100"
 	}
-	var timelines = dto.GetPublicTimeline() //update to no_msg
+	var timelines = dto.GetPublicTimeline() //update to noMsg
 	var messages []ApiMessage
 	for _, t := range timelines {
 		var message ApiMessage
@@ -110,31 +97,29 @@ func Messages(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(messages)
 }
 
-func Messages_per_user(w http.ResponseWriter, r *http.Request) {
+func MessagesPerUser(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
-	update_latest(w, r)
+	updateLatest(w, r)
 	metrics.IncrementRequests()
 	vars := mux.Vars(r)
 	username := vars["username"]
 
-	//not_req_from_simulator(w, r)
-
-	no_msg := r.URL.Query().Get("no")
-	if no_msg == "" {
-		no_msg = "100"
+	noMsg := r.URL.Query().Get("no")
+	if noMsg == "" {
+		noMsg = "100"
 	}
 
 	switch r.Method {
 	case "GET":
-		user_id := dto.GetUserID(username)
-		if user_id == 0 {
+		userId := dto.GetUserID(username)
+		if userId == 0 {
 			var res Response
 			res.Status = 404
 			res.ErrorMsg = "No user found for " + username
 			json.NewEncoder(w).Encode(res)
-			log.Info("User id for user "+username+" was not found")
+			log.Info("User id for user " + username + " was not found")
 		} else {
-			var timelines = dto.GetUserTimeline(user_id) //update to no_msg
+			var timelines = dto.GetUserTimeline(userId) //update to noMsg
 			var messages []ApiMessage
 			for _, t := range timelines {
 				var message ApiMessage
@@ -146,10 +131,10 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(messages)
 		}
 	case "POST":
-		user_id := dto.GetUserID(username)
+		userId := dto.GetUserID(username)
 		var message ApiMessage
 		json.NewDecoder(r.Body).Decode(&message)
-		dto.AddMessage(strconv.Itoa(user_id), message.Content, time.Now(), 0)
+		dto.AddMessage(strconv.Itoa(userId), message.Content, time.Now(), 0)
 		var res Response
 		res.Status = 204
 		res.ErrorMsg = ""
@@ -162,26 +147,25 @@ func Messages_per_user(w http.ResponseWriter, r *http.Request) {
 }
 
 func Follow(w http.ResponseWriter, r *http.Request) {
-	update_latest(w, r)
+	updateLatest(w, r)
 	metrics.IncrementRequests()
 
-	//not_req_from_simulator(w, r)
 	vars := mux.Vars(r)
 	username := vars["username"]
 
-	no_followers := r.URL.Query().Get("no")
-	if no_followers == "" {
-		no_followers = "100"
+	noFollowers := r.URL.Query().Get("no")
+	if noFollowers == "" {
+		noFollowers = "100"
 	}
 
-	user_id := dto.GetUserID(username)
-	if user_id == 0 {
+	userId := dto.GetUserID(username)
+	if userId == 0 {
 		var res Response
 		res.Status = 404
-		res.ErrorMsg = "No user found"
+		res.ErrorMsg = noUserFound
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		json.NewEncoder(w).Encode(res)
-		log.Info("User id for user "+username+" was not found")
+		log.Info("User id for user " + username + " was not found")
 	}
 
 	switch r.Method {
@@ -190,17 +174,17 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 		var follows FollowUser
 		json.NewDecoder(r.Body).Decode(&follows)
 		if len(follows.Follow) > 0 {
-			follows_username := follows.Follow
-			follows_user_id := dto.GetUserID(follows_username)
-			if follows_user_id == 0 {
+			followsUsername := follows.Follow
+			followsUserId := dto.GetUserID(followsUsername)
+			if followsUserId == 0 {
 				var res Response
 				res.Status = 404
-				res.ErrorMsg = "No user found"
+				res.ErrorMsg = noUserFound
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
-				log.Info("User id for user to follow "+follows_username+" was not found")
+				log.Info("User id for user to follow " + followsUsername + " not found")
 			} else {
-				dto.FollowUser(user_id, follows_user_id)
+				dto.FollowUser(userId, followsUserId)
 				metrics.IncrementFollows()
 				var res Response
 				res.Status = 204
@@ -209,17 +193,17 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 			}
 		} else if len(follows.Unfollow) > 0 {
-			unfollows_username := follows.Unfollow
-			unfollows_user_id := dto.GetUserID(unfollows_username)
-			if user_id == 0 {
+			unfollowsUsername := follows.Unfollow
+			unfollowsUserId := dto.GetUserID(unfollowsUsername)
+			if userId == 0 {
 				var res Response
 				res.Status = 404
-				res.ErrorMsg = "No user found"
+				res.ErrorMsg = noUserFound
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
-				log.Info("User id for user to unfollow "+unfollows_username+" was not found")
+				log.Info("User id for user to unfollow " + unfollowsUsername + " not found")
 			} else {
-				dto.UnfollowUser(user_id, unfollows_user_id)
+				dto.UnfollowUser(userId, unfollowsUserId)
 				metrics.IncrementUnfollows()
 				var res Response
 				res.Status = 204
@@ -228,9 +212,9 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 			}
 		}
-		case "GET":
-			numb, _ := strconv.Atoi(no_followers)
-			var followers = dto.GetFollowers(user_id, numb)
-			json.NewEncoder(w).Encode(followers)
-		}
+	case "GET":
+		numb, _ := strconv.Atoi(noFollowers)
+		var followers = dto.GetFollowers(userId, numb)
+		json.NewEncoder(w).Encode(followers)
 	}
+}

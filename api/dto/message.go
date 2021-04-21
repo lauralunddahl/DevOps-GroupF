@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+	database "github.com/lauralunddahl/DevOps-GroupF/api/db"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,15 +15,14 @@ type Message struct {
 	Flagged   int
 }
 
-func AddMessage(author_id string, text string, pub_date time.Time, flagged int) { //change pub_date to date at some point
-	message := Message{AuthorId: author_id, Text: text, PubDate: pub_date, Flagged: flagged}
+func AddMessage(authorId string, text string, pubDate time.Time, flagged int) {
+	message := Message{AuthorId: authorId, Text: text, PubDate: pubDate, Flagged: flagged}
 	result := database.DB.Create(&message)
 	if result.Error != nil {
 		log.Println("AddMessage")
 		log.Error(result.Error)
 	}
 }
-
 
 func GetTotalNumberOfMessages() int64 {
 	var result int64
