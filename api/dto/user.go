@@ -1,7 +1,7 @@
 package dto
 
 import (
-	database "github.com/lauralunddahl/DevOps-GroupF/db"
+	database "github.com/lauralunddahl/DevOps-GroupF/api/db"
 	log "github.com/sirupsen/logrus"
 )
 

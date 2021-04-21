@@ -1,7 +1,7 @@
 package dto
 
 import (
-	database "github.com/lauralunddahl/DevOps-GroupF/db"
+	database "github.com/lauralunddahl/DevOps-GroupF/program/db"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -51,10 +51,4 @@ func UnfollowUser(who_id int, whom_id int) {
 		log.Println("UnfollowUser")
 		log.Error(result.Error)
 	}
-}
-
-func GetTotalNumberOfFollowerEntries() int64 {
-	var result int64
-	database.DB.Table("followers").Count(&result)
-	return result
 }

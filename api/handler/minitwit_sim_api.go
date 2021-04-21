@@ -9,7 +9,7 @@ import (
 
 	dto "github.com/lauralunddahl/DevOps-GroupF/api/dto"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/api/metrics"
-	helper "github.com/lauralunddahl/DevOps-GroupF/program/helper"
+	helper "github.com/lauralunddahl/DevOps-GroupF/api/helper"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"

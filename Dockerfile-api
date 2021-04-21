@@ -2,7 +2,7 @@ FROM golang:latest
 
 #RUN apk update && apk upgrade && apk add --no-cache git
 
-WORKDIR .
+WORKDIR ./api
 
 COPY ./api .
 

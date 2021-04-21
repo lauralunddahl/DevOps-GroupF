@@ -1,7 +1,7 @@
 package dto
 
 import (
-	database "github.com/lauralunddahl/DevOps-GroupF/db"
+	database "github.com/lauralunddahl/DevOps-GroupF/program/db"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -62,10 +62,4 @@ func RegisterUser(username string, email string, password string, image string) 
 		log.Println("RegisterUser")
 		log.Error(result.Error)
 	}
-}
-
-func GetTotalNumberOfUsers() int64 {
-	var result int64
-	database.DB.Table("users").Count(&result)
-	return result
 }

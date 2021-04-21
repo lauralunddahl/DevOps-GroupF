@@ -46,7 +46,7 @@ func Private_timeline(w http.ResponseWriter, r *http.Request) {
 		user_id := session.Values["userId"].(int)
 		var timelines = dto.GetPrivateTimeline(user_id)
 
-		templ := template.Must(template.ParseFiles("./program/templates/layout.html", "./program/templates/tmp.html"))
+		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":  timelines,
 			"public":    false,
@@ -62,7 +62,7 @@ func Private_timeline(w http.ResponseWriter, r *http.Request) {
 }
 
 func Loginpage(w http.ResponseWriter, r *http.Request) {
-	loginp, err := template.ParseFiles("./program/templates/layout.html", "./program/templates/login.html")
+	loginp, err := template.ParseFiles("./templates/layout.html", "./templates/login.html")
 	if err != nil {
 		println(err.Error())
 	}
@@ -75,6 +75,7 @@ func Loginpage(w http.ResponseWriter, r *http.Request) {
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+	fmt.Println("Loggin in with: " + username)
 	var user = dto.GetUser(username)
 	if user.Username == "" {
 		fmt.Fprintln(w, "invalid username")
@@ -111,7 +112,7 @@ func userLoggedin(r *http.Request) bool {
 
 func Public_timeline(w http.ResponseWriter, r *http.Request) {
 	var timelines = dto.GetPublicTimeline()
-	templ := template.Must(template.ParseFiles("./program/templates/layout.html", "./program/templates/tmp.html"))
+	templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
@@ -126,9 +127,13 @@ func Public_timeline(w http.ResponseWriter, r *http.Request) {
 
 func User_timeline(w http.ResponseWriter, r *http.Request) {
 	user_id := 0
+	//var profileuser User
 	vars := mux.Vars(r)
 
 	username := vars["username"]
+	if username == "metrics"{
+		return
+	}
 
 	session, _ := store.Get(r, "session1")
 
@@ -143,7 +148,7 @@ func User_timeline(w http.ResponseWriter, r *http.Request) {
 
 		var timelines = dto.GetUserTimeline(profileuser.UserId)
 
-		templ := template.Must(template.ParseFiles("./program/templates/layout.html", "./program/templates/tmp.html"))
+		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":     timelines,
@@ -228,7 +233,7 @@ func Add_message(w http.ResponseWriter, r *http.Request) {
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	register, err := template.ParseFiles("./program/templates/layout.html", "./program/templates/register.html")
+	register, err := template.ParseFiles("./templates/layout.html", "./templates/register.html")
 	if err != nil {
 		println(err.Error())
 	}
@@ -272,7 +277,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	register, err2 := template.ParseFiles("./program/templates/layout.html", "./program/templates/register.html")
+	register, err2 := template.ParseFiles("./templates/layout.html", "./templates/register.html")
 	if err2 != nil {
 		println(err2.Error())
 	}
