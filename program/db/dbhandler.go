@@ -3,7 +3,6 @@ package db
 import (
 	"fmt"
 	"os"
-	//"path/filepath"
 
 	"gorm.io/gorm"
 
@@ -15,7 +14,6 @@ import (
 var DB *gorm.DB
 
 func init() {
-	//envpath := filepath.Join("/home/parallels/Desktop/DevOps-GroupF/", ".env")
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Println("Not running locally")
@@ -34,9 +32,3 @@ func init() {
 func GetDB() *gorm.DB {
 	return DB
 }
-
-// func initialMigration() {
-// 	db.AutoMigrate(&User{})
-// 	db.AutoMigrate(&Message{})
-// 	db.AutoMigrate(&Follower{})
-// }
