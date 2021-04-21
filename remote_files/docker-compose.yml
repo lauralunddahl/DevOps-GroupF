@@ -43,14 +43,14 @@ services:
         image: grafana/grafana:4.5.2
         container_name: grafana
         ports:
-        - "3000:3000"  
+        - "3000:3000"
         networks:
         - minitwit
         depends_on:
         - minitwit
         volumes:
         - grafana-storage:/var/lib/grafana
-    
+
     elasticsearch:
         image: "docker.elastic.co/elasticsearch/elasticsearch:7.2.0"
         container_name: elasticsearch
@@ -72,6 +72,7 @@ services:
         - "5601:5601"
         environment:
             elasticsearch.hosts: '["http://elasticsearch:9200"]'
+            server.host: "0.0.0.0"
         depends_on:
         - elasticsearch
         networks:
