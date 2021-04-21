@@ -17,6 +17,7 @@ import (
 )
 
 var latest = 0
+var noUserFound = "No user found"
 
 func updateLatest(w http.ResponseWriter, r *http.Request) int {
 	late, _ := strconv.Atoi(r.URL.Query().Get("latest"))
@@ -161,7 +162,7 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 	if userId == 0 {
 		var res Response
 		res.Status = 404
-		res.ErrorMsg = "No user found"
+		res.ErrorMsg = noUserFound
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		json.NewEncoder(w).Encode(res)
 		log.Info("User id for user " + username + " was not found")
@@ -178,10 +179,10 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 			if followsUserId == 0 {
 				var res Response
 				res.Status = 404
-				res.ErrorMsg = "No user found"
+				res.ErrorMsg = noUserFound
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
-				log.Info("User id for user to follow " + followsUsername + " was not found")
+				log.Info("User id for user to follow " + followsUsername + " not found")
 			} else {
 				dto.FollowUser(userId, followsUserId)
 				metrics.IncrementFollows()
@@ -197,10 +198,10 @@ func Follow(w http.ResponseWriter, r *http.Request) {
 			if userId == 0 {
 				var res Response
 				res.Status = 404
-				res.ErrorMsg = "No user found"
+				res.ErrorMsg = noUserFound
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				json.NewEncoder(w).Encode(res)
-				log.Info("User id for user to unfollow " + unfollowsUsername + " was not found")
+				log.Info("User id for user to unfollow " + unfollowsUsername + " not found")
 			} else {
 				dto.UnfollowUser(userId, unfollowsUserId)
 				metrics.IncrementUnfollows()

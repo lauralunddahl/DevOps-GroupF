@@ -26,6 +26,8 @@ var (
 	tmp = "./templates/tmp.html"
 	login = "./templates/login.html"
 	register = "./templates/register.html"
+	noUserFound = "User not found"
+	notAuth = "Not authorized"
 )
 
 func BeforeRequest(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
@@ -170,7 +172,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		http.Error(w, "User not found", 404)
+		http.Error(w, noUserFound, 404)
 	}
 }
 
@@ -185,11 +187,11 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		userId = session.Values["userId"].(int)
 	}
 	if userId == 0 {
-		http.Error(w, "not authorized", http.StatusUnauthorized)
+		http.Error(w, notAuth, http.StatusUnauthorized)
 	} else {
 		whomId := dto.GetUserID(username)
 		if whomId == 0 {
-			http.Error(w, "User not found", 404)
+			http.Error(w, noUserFound, 404)
 		}
 		dto.FollowUser(userId, whomId)
 		dialog.Alert("You are now following %s", username)
@@ -208,11 +210,11 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		userId = session.Values["userId"].(int)
 	}
 	if userId == 0 {
-		http.Error(w, "not authorized", http.StatusUnauthorized)
+		http.Error(w, notAuth, http.StatusUnauthorized)
 	} else {
 		whomId := dto.GetUserID(username)
 		if whomId == 0 {
-			http.Error(w, "User not found", 404)
+			http.Error(w, noUserFound, 404)
 		}
 		dto.UnfollowUser(userId, whomId)
 		dialog.Alert("You are no longer following %s", username)
@@ -227,7 +229,7 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		userId = session.Values["userId"].(int)
 	}
 	if userId == 0 {
-		http.Error(w, "not authorized", http.StatusUnauthorized)
+		http.Error(w, notAuth, http.StatusUnauthorized)
 	} else {
 		text := r.FormValue("text")
 		dto.AddMessage(strconv.Itoa(userId), text, time.Now(), 0)
