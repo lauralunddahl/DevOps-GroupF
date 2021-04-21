@@ -5,10 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	logging "github.com/lauralunddahl/DevOps-GroupF/src/program/logging"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/program/metrics"
-	minitwit "github.com/lauralunddahl/DevOps-GroupF/src/program/minitwit"
-	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
+	minitwit "github.com/lauralunddahl/DevOps-GroupF/program/minitwit"
 )
 
 func main() {
@@ -26,13 +23,9 @@ func main() {
 	router.HandleFunc("/add_message", minitwit.Add_message).Methods("POST")
 	router.HandleFunc("/logout", minitwit.Logout)
 
-	metrics.RecordMetrics()
-	router.Handle("/metrics", promhttp.Handler())
-
 	router.HandleFunc("/{username}", minitwit.User_timeline).Methods("GET")
 	router.HandleFunc("/{username}/follow", minitwit.Follow_user)
 	router.HandleFunc("/{username}/unfollow", minitwit.Unfollow_user)
-	logging.Logging()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	dto "github.com/lauralunddahl/DevOps-GroupF/src/api/dto"
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/program/helper"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/program/metrics"
+	dto "github.com/lauralunddahl/DevOps-GroupF/api/dto"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/api/metrics"
+	helper "github.com/lauralunddahl/DevOps-GroupF/program/helper"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"

@@ -10,11 +10,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	dto "github.com/lauralunddahl/DevOps-GroupF/src/program/dto"
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/program/helper"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/program/metrics"
+	dto "github.com/lauralunddahl/DevOps-GroupF/program/dto"
+	helper "github.com/lauralunddahl/DevOps-GroupF/program/helper"
 	_ "github.com/mattn/go-sqlite3"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"tawesoft.co.uk/go/dialog"
 )
@@ -185,7 +183,6 @@ func Follow_user(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "User not found", 404)
 		}
 		dto.FollowUser(user_id, whom_id)
-		metrics.IncrementFollows()
 		dialog.Alert("You are now following %s", username)
 		http.Redirect(w, r, "/"+username, http.StatusFound)
 	}
@@ -209,7 +206,6 @@ func Unfollow_user(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "User not found", 404)
 		}
 		dto.UnfollowUser(user_id, whom_id)
-		metrics.IncrementUnfollows()
 		dialog.Alert("You are no longer following %s", username)
 		http.Redirect(w, r, "/"+username, http.StatusFound)
 	}
@@ -228,7 +224,6 @@ func Add_message(w http.ResponseWriter, r *http.Request) {
 		dto.AddMessage(strconv.Itoa(user_id), text, time.Now(), 0)
 		dialog.Alert("Your message was recorded")
 		http.Redirect(w, r, "/", http.StatusFound)
-		log.Println("message recorded")
 	}
 }
 

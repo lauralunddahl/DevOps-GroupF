@@ -4,9 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+	database "github.com/lauralunddahl/DevOps-GroupF/db"
 	log "github.com/sirupsen/logrus"
-
 )
 
 type Timeline struct {

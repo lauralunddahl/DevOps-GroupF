@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	api "github.com/lauralunddahl/DevOps-GroupF/src/api/handler"
-	logging "github.com/lauralunddahl/DevOps-GroupF/src/program/logging"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/program/metrics"
+	api "github.com/lauralunddahl/DevOps-GroupF/api/handler"
+	logging "github.com/lauralunddahl/DevOps-GroupF/api/logging"
+	metrics "github.com/lauralunddahl/DevOps-GroupF/api/metrics"
 )
 
 func main() {

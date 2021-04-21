@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	dto "github.com/lauralunddahl/DevOps-GroupF/src/program/dto"
+	dto "github.com/lauralunddahl/DevOps-GroupF/api/dto"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	cpu "github.com/shirou/gopsutil/cpu"

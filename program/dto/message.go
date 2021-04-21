@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+	database "github.com/lauralunddahl/DevOps-GroupF/db"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,4 +22,10 @@ func AddMessage(author_id string, text string, pub_date time.Time, flagged int) 
 		log.Println("AddMessage")
 		log.Error(result.Error)
 	}
+}
+
+func GetTotalNumberOfMessages() int64 {
+	var result int64
+	database.DB.Table("messages").Count(&result)
+	return result
 }

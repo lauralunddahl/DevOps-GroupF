@@ -1,13 +1,18 @@
 package dto
 
 import (
-	database "github.com/lauralunddahl/DevOps-GroupF/src/db"
+	database "github.com/lauralunddahl/DevOps-GroupF/db"
 	log "github.com/sirupsen/logrus"
 )
 
 type Follower struct {
 	WhoId  int
 	WhomId int
+}
+
+func IsFollowing(who_id int, whom_id int) bool {
+	follower := getFollower(who_id, whom_id)
+	return follower.WhoId != 0
 }
 
 func FollowUser(who_id int, whom_id int) {
@@ -46,4 +51,10 @@ func UnfollowUser(who_id int, whom_id int) {
 		log.Println("UnfollowUser")
 		log.Error(result.Error)
 	}
+}
+
+func GetTotalNumberOfFollowerEntries() int64 {
+	var result int64
+	database.DB.Table("followers").Count(&result)
+	return result
 }

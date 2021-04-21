@@ -2,15 +2,15 @@ FROM golang:latest
 
 #RUN apk update && apk upgrade && apk add --no-cache git
 
-WORKDIR ./src
+WORKDIR .
 
-COPY ./src/api .
+COPY ./api .
 
-COPY ./src/go.mod .
-COPY ./src/go.sum .
+COPY ./api/go.mod .
+COPY ./api/go.sum .
 RUN go mod download
 
-RUN GOOS=linux go build -o ./out/minitwit
+RUN GOOS=linux go build -o ./out/minitwit-api
 
 EXPOSE 8081
 
