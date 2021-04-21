@@ -21,13 +21,13 @@ var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
-	
-	layout = "./templates/layout.html"
-	tmp = "./templates/tmp.html"
-	login = "./templates/login.html"
-	register = "./templates/register.html"
+
+	layout      = "./templates/layout.html"
+	tmp         = "./templates/tmp.html"
+	login       = "./templates/login.html"
+	register    = "./templates/register.html"
 	noUserFound = "User not found"
-	notAuth = "Not authorized"
+	notAuth     = "Not authorized"
 )
 
 func BeforeRequest(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +137,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	username := vars["username"]
-	if username == "metrics"{
+	if username == "metrics" {
 		return
 	}
 
