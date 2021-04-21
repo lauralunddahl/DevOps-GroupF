@@ -13,11 +13,11 @@ import (
 func main() {
 	apirouter := mux.NewRouter()
 
-	apirouter.HandleFunc("/latest", api.Get_latest).Methods("GET")
+	apirouter.HandleFunc("/latest", api.GetLatest).Methods("GET")
 	apirouter.HandleFunc("/register", api.RegisterUser).Methods("POST")
 	apirouter.HandleFunc("/msgs", api.Messages).Methods("GET")
 	apirouter.HandleFunc("/fllws/{username}", api.Follow).Methods("GET", "POST")
-	apirouter.HandleFunc("/msgs/{username}", api.Messages_per_user).Methods("GET", "POST")
+	apirouter.HandleFunc("/msgs/{username}", api.MessagesPerUser).Methods("GET", "POST")
 
 	metrics.RecordMetrics()
 	logging.Logging()

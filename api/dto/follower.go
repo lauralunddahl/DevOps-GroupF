@@ -10,13 +10,13 @@ type Follower struct {
 	WhomId int
 }
 
-func IsFollowing(who_id int, whom_id int) bool {
-	follower := getFollower(who_id, whom_id)
+func IsFollowing(whoId int, whomId int) bool {
+	follower := getFollower(whoId, whomId)
 	return follower.WhoId != 0
 }
 
-func FollowUser(who_id int, whom_id int) {
-	follower := Follower{WhoId: who_id, WhomId: whom_id}
+func FollowUser(whoId int, whomId int) {
+	follower := Follower{WhoId: whoId, WhomId: whomId}
 	result := database.DB.Create(&follower)
 	if result.Error != nil {
 		log.Println("FollowUser")
@@ -24,9 +24,9 @@ func FollowUser(who_id int, whom_id int) {
 	}
 }
 
-func getFollower(who_id int, whom_id int) Follower {
+func getFollower(whoId int, whomId int) Follower {
 	follower := Follower{}
-	res := database.DB.Where("who_id = ? and whom_id = ?", who_id, whom_id).First(&follower)
+	res := database.DB.Where("who_id = ? and whom_id = ?", whoId, whomId).First(&follower)
 	if res.Error != nil {
 		log.Println("getFollower")
 		log.Error(res.Error)
@@ -34,9 +34,9 @@ func getFollower(who_id int, whom_id int) Follower {
 	return follower
 }
 
-func GetFollowers(who_id int, limit int) []Follower {
+func GetFollowers(whoId int, limit int) []Follower {
 	var followers []Follower
-	res := database.DB.Table("followers").Where("who_id = ?", who_id).Limit(limit).Scan(&followers)
+	res := database.DB.Table("followers").Where("who_id = ?", whoId).Limit(limit).Scan(&followers)
 	if res.Error != nil {
 		log.Println("GetFollowers")
 		log.Error(res.Error)
@@ -44,9 +44,9 @@ func GetFollowers(who_id int, limit int) []Follower {
 	return followers
 }
 
-func UnfollowUser(who_id int, whom_id int) {
-	follower := getFollower(who_id, whom_id)
-	result := database.DB.Where("who_id = ? and whom_id = ?", who_id, whom_id).Delete(&follower)
+func UnfollowUser(whoId int, whomId int) {
+	follower := getFollower(whoId, whomId)
+	result := database.DB.Where("who_id = ? and whom_id = ?", whoId, whomId).Delete(&follower)
 	if result.Error != nil {
 		log.Println("UnfollowUser")
 		log.Error(result.Error)

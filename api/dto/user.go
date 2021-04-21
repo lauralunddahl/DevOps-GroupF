@@ -34,9 +34,9 @@ func GetUser(username string) User {
 	return user
 }
 
-func GetUserById(user_id int) User {
+func GetUserById(userId int) User {
 	user := User{}
-	res := database.DB.Where("user_id = ?", user_id).First(&user)
+	res := database.DB.Where("user_id = ?", userId).First(&user)
 	if res.Error != nil {
 		log.Println("GetUserById")
 		log.Error(res.Error)
@@ -44,9 +44,9 @@ func GetUserById(user_id int) User {
 	return user
 }
 
-func GetUsername(userid int) string {
+func GetUsername(userId int) string {
 	user := User{}
-	res := database.DB.Where("user_id = ?", userid).First(&user)
+	res := database.DB.Where("user_id = ?", userId).First(&user)
 	if res.Error != nil {
 		log.Println("GetUsername")
 		log.Error(res.Error)

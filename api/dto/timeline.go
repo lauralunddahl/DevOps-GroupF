@@ -23,11 +23,11 @@ type Timeline struct {
 }
 
 var db = database.DB
-var per_page = 30
+var perPage = 30
 
-func GetPrivateTimeline(user_id int) []Timeline {
+func GetPrivateTimeline(userId int) []Timeline {
 	var timeline []Timeline
-	res := db.Table("messages").Select("users.*, messages.*").Joins("join users on messages.author_id = users.user_id").Where("messages.flagged = 0 and (users.user_id = ? or users.user_id in (select whom_id from followers where who_id = ?))", strconv.Itoa(user_id), strconv.Itoa(user_id)).Order("messages.pub_date desc").Limit(per_page).Scan(&timeline)
+	res := db.Table("messages").Select("users.*, messages.*").Joins("join users on messages.author_id = users.user_id").Where("messages.flagged = 0 and (users.user_id = ? or users.user_id in (select whom_id from followers where who_id = ?))", strconv.Itoa(userId), strconv.Itoa(userId)).Order("messages.pub_date desc").Limit(perPage).Scan(&timeline)
 	if res.Error != nil {
 		log.Println("Private timeline")
 		log.Error(res.Error)
@@ -37,7 +37,7 @@ func GetPrivateTimeline(user_id int) []Timeline {
 
 func GetPublicTimeline() []Timeline {
 	var timeline []Timeline
-	res := db.Table("messages").Select("users.*, messages.*").Joins("join users on messages.author_id = users.user_id").Where("messages.flagged = 0").Order("messages.pub_date desc").Limit(per_page).Scan(&timeline)
+	res := db.Table("messages").Select("users.*, messages.*").Joins("join users on messages.author_id = users.user_id").Where("messages.flagged = 0").Order("messages.pub_date desc").Limit(perPage).Scan(&timeline)
 	if res.Error != nil {
 		log.Println("Public timeline")
 		log.Error(res.Error)
@@ -45,9 +45,9 @@ func GetPublicTimeline() []Timeline {
 	return timeline
 }
 
-func GetUserTimeline(profile_user_id int) []Timeline {
+func GetUserTimeline(profileUserId int) []Timeline {
 	var timeline []Timeline
-	res := db.Table("messages").Select("users.*, messages.*").Joins("join users on messages.author_id = users.user_id").Where("users.user_id = ?", strconv.Itoa(profile_user_id)).Order("messages.pub_date desc").Limit(per_page).Scan(&timeline)
+	res := db.Table("messages").Select("users.*, messages.*").Joins("join users on messages.author_id = users.user_id").Where("users.user_id = ?", strconv.Itoa(profileUserId)).Order("messages.pub_date desc").Limit(perPage).Scan(&timeline)
 	if res.Error != nil {
 		log.Println("User timeline")
 		log.Error(res.Error)

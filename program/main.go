@@ -13,19 +13,19 @@ func main() {
 
 	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
-	router.HandleFunc("/", minitwit.Private_timeline).Methods("GET")
-	router.HandleFunc("/register", minitwit.Before_request(minitwit.Register)).Methods("GET")
+	router.HandleFunc("/", minitwit.PrivateTimeline).Methods("GET")
+	router.HandleFunc("/register", minitwit.BeforeRequest(minitwit.Register)).Methods("GET")
 	router.HandleFunc("/registerfunc", minitwit.HandleRegister).Methods("POST")
-	router.HandleFunc("/", minitwit.Before_request(minitwit.Private_timeline)).Methods("GET")
-	router.HandleFunc("/login", minitwit.Before_request(minitwit.Loginpage))
+	router.HandleFunc("/", minitwit.BeforeRequest(minitwit.PrivateTimeline)).Methods("GET")
+	router.HandleFunc("/login", minitwit.BeforeRequest(minitwit.Loginpage))
 	router.HandleFunc("/loginfunc", minitwit.HandleLogin).Methods("POST")
-	router.HandleFunc("/public", minitwit.Public_timeline)
-	router.HandleFunc("/add_message", minitwit.Add_message).Methods("POST")
+	router.HandleFunc("/public", minitwit.PublicTimeline)
+	router.HandleFunc("/add_message", minitwit.AddMessage).Methods("POST")
 	router.HandleFunc("/logout", minitwit.Logout)
 
-	router.HandleFunc("/{username}", minitwit.User_timeline).Methods("GET")
-	router.HandleFunc("/{username}/follow", minitwit.Follow_user)
-	router.HandleFunc("/{username}/unfollow", minitwit.Unfollow_user)
+	router.HandleFunc("/{username}", minitwit.UserTimeline).Methods("GET")
+	router.HandleFunc("/{username}/follow", minitwit.FollowUser)
+	router.HandleFunc("/{username}/unfollow", minitwit.UnfollowUser)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
