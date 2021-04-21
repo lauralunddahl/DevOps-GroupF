@@ -21,6 +21,11 @@ var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
+	
+	layout = "./templates/layout.html"
+	tmp = "./templates/tmp.html"
+	login = "./templates/login.html"
+	register = "./templates/register.html"
 )
 
 func BeforeRequest(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +51,7 @@ func PrivateTimeline(w http.ResponseWriter, r *http.Request) {
 		userId := session.Values["userId"].(int)
 		var timelines = dto.GetPrivateTimeline(userId)
 
-		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
+		templ := template.Must(template.ParseFiles(layout, tmp))
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":  timelines,
 			"public":    false,
@@ -62,7 +67,7 @@ func PrivateTimeline(w http.ResponseWriter, r *http.Request) {
 }
 
 func Loginpage(w http.ResponseWriter, r *http.Request) {
-	loginp, err := template.ParseFiles("./templates/layout.html", "./templates/login.html")
+	loginp, err := template.ParseFiles(layout, login)
 	if err != nil {
 		println(err.Error())
 	}
@@ -112,7 +117,7 @@ func userLoggedin(r *http.Request) bool {
 
 func PublicTimeline(w http.ResponseWriter, r *http.Request) {
 	var timelines = dto.GetPublicTimeline()
-	templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
+	templ := template.Must(template.ParseFiles(layout, tmp))
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
@@ -147,7 +152,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 		var timelines = dto.GetUserTimeline(profileuser.UserId)
 
-		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
+		templ := template.Must(template.ParseFiles(layout, tmp))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":     timelines,
@@ -232,7 +237,7 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	register, err := template.ParseFiles("./templates/layout.html", "./templates/register.html")
+	register, err := template.ParseFiles(layout, register)
 	if err != nil {
 		println(err.Error())
 	}
@@ -276,7 +281,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	register, err2 := template.ParseFiles("./templates/layout.html", "./templates/register.html")
+	register, err2 := template.ParseFiles(layout, register)
 	if err2 != nil {
 		println(err2.Error())
 	}
