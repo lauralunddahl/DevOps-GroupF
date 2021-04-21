@@ -26,10 +26,11 @@ var db = database.DB
 var perPage = 30
 
 var usersMessages = db.Table("messages").Select("users.*, messages.*").Joins("join users on messages.author_id = users.user_id")
+var order = "messages.pub_date desc"
 
 func GetPrivateTimeline(userId int) []Timeline {
 	var timeline []Timeline
-	res := usersMessages.Where("messages.flagged = 0 and (users.user_id = ? or users.user_id in (select whom_id from followers where who_id = ?))", strconv.Itoa(userId), strconv.Itoa(userId)).Order("messages.pub_date desc").Limit(perPage).Scan(&timeline)
+	res := usersMessages.Where("messages.flagged = 0 and (users.user_id = ? or users.user_id in (select whom_id from followers where who_id = ?))", strconv.Itoa(userId), strconv.Itoa(userId)).Order(order).Limit(perPage).Scan(&timeline)
 	if res.Error != nil {
 		log.Println("Private timeline")
 		log.Error(res.Error)
@@ -39,7 +40,7 @@ func GetPrivateTimeline(userId int) []Timeline {
 
 func GetPublicTimeline() []Timeline {
 	var timeline []Timeline
-	res := usersMessages.Where("messages.flagged = 0").Order("messages.pub_date desc").Limit(perPage).Scan(&timeline)
+	res := usersMessages.Where("messages.flagged = 0").Order(order).Limit(perPage).Scan(&timeline)
 	if res.Error != nil {
 		log.Println("Public timeline")
 		log.Error(res.Error)
@@ -49,7 +50,7 @@ func GetPublicTimeline() []Timeline {
 
 func GetUserTimeline(profileUserId int) []Timeline {
 	var timeline []Timeline
-	res := usersMessages.Where("users.user_id = ?", strconv.Itoa(profileUserId)).Order("messages.pub_date desc").Limit(perPage).Scan(&timeline)
+	res := usersMessages.Where("users.user_id = ?", strconv.Itoa(profileUserId)).Order(order).Limit(perPage).Scan(&timeline)
 	if res.Error != nil {
 		log.Println("User timeline")
 		log.Error(res.Error)
