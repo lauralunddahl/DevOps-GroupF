@@ -37,10 +37,8 @@
     {{else}}
           {{ range .timeline }}
           <li><img src="{{.Image}}"alt="picture"><p> <!--.image-->
-          <!--TODO: figure out how to call "gravatar_url" with email-->
             <strong><a href="/{{.Username}}">{{ .Username }}</a></strong>
             {{.Text}}
-            <!--TODO: figure out how to call "format_datetime" with the pubdate-->
             <small>&mdash; {{ .PubDate }}</small> 
           </li>
           {{end}}

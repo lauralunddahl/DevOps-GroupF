@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
+	dto "github.com/lauralunddahl/DevOps-GroupF/api/dto"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	cpu "github.com/shirou/gopsutil/cpu"
@@ -13,7 +13,7 @@ import (
 
 const interval = 5
 
-var bytes_to_gigabytes = float64(1073741824)
+var bytesToGigabytes = float64(1073741824)
 
 //Prometheus objects needed as global variables:
 var followed = promauto.NewCounter(prometheus.CounterOpts{
@@ -113,7 +113,7 @@ func virtualMemoryMetrics() {
 	go func() {
 		for {
 			v, _ := mem.VirtualMemory()
-			memoryAvailable.Set(float64(v.Available) / bytes_to_gigabytes)
+			memoryAvailable.Set(float64(v.Available) / bytesToGigabytes)
 			memoryPercentage.Set(v.UsedPercent)
 			time.Sleep(interval * time.Second)
 		}

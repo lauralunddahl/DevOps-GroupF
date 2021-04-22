@@ -8,12 +8,10 @@ import (
 	"strings"
 	"time"
 
-	dto "github.com/lauralunddahl/DevOps-GroupF/src/dto"
-	helper "github.com/lauralunddahl/DevOps-GroupF/src/helper"
-	metrics "github.com/lauralunddahl/DevOps-GroupF/src/metrics"
-	log "github.com/sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	dto "github.com/lauralunddahl/DevOps-GroupF/program/dto"
+	helper "github.com/lauralunddahl/DevOps-GroupF/program/helper"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 	"tawesoft.co.uk/go/dialog"
@@ -23,9 +21,16 @@ var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
+
+	layout      = "./templates/layout.html"
+	tmp         = "./templates/tmp.html"
+	login       = "./templates/login.html"
+	register    = "./templates/register.html"
+	noUserFound = "User not found"
+	notAuth     = "Not authorized"
 )
 
-func Before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+func BeforeRequest(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, _ := store.Get(r, "session1")
 		session.Values["authenticated"] = false
@@ -39,23 +44,23 @@ func Before_request(handler func(w http.ResponseWriter, r *http.Request)) func(w
 	}
 }
 
-func Private_timeline(w http.ResponseWriter, r *http.Request) {
+func PrivateTimeline(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session1")
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Redirect(w, r, "/public", 302)
+		http.Redirect(w, r, "/public", http.StatusFound)
 	} else {
-		user_id := session.Values["userId"].(int)
-		var timelines = dto.GetPrivateTimeline(user_id)
+		userId := session.Values["userId"].(int)
+		var timelines = dto.GetPrivateTimeline(userId)
 
-		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
+		templ := template.Must(template.ParseFiles(layout, tmp))
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":  timelines,
 			"public":    false,
 			"type":      "default",
 			"loggedin":  true,
-			"sess_u_id": user_id,
-			"username":  dto.GetUsername(user_id),
+			"sess_u_id": userId,
+			"username":  dto.GetUsername(userId),
 		})
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -64,7 +69,7 @@ func Private_timeline(w http.ResponseWriter, r *http.Request) {
 }
 
 func Loginpage(w http.ResponseWriter, r *http.Request) {
-	loginp, err := template.ParseFiles("./templates/layout.html", "./templates/login.html")
+	loginp, err := template.ParseFiles(layout, login)
 	if err != nil {
 		println(err.Error())
 	}
@@ -77,6 +82,7 @@ func Loginpage(w http.ResponseWriter, r *http.Request) {
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+	fmt.Println("Loggin in with: " + username)
 	var user = dto.GetUser(username)
 	if user.Username == "" {
 		fmt.Fprintln(w, "invalid username")
@@ -94,7 +100,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = true
 	session.Values["userId"] = user.UserId
 	session.Save(r, w)
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func userLoggedin(r *http.Request) bool {
@@ -103,17 +109,17 @@ func userLoggedin(r *http.Request) bool {
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		userLoggedin = false
 	} else {
-		user_id := session.Values["userId"].(int)
-		if user_id != 0 {
+		userId := session.Values["userId"].(int)
+		if userId != 0 {
 			userLoggedin = true
 		}
 	}
 	return userLoggedin
 }
 
-func Public_timeline(w http.ResponseWriter, r *http.Request) {
+func PublicTimeline(w http.ResponseWriter, r *http.Request) {
 	var timelines = dto.GetPublicTimeline()
-	templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
+	templ := template.Must(template.ParseFiles(layout, tmp))
 
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
@@ -126,26 +132,29 @@ func Public_timeline(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func User_timeline(w http.ResponseWriter, r *http.Request) {
-	user_id := 0
+func UserTimeline(w http.ResponseWriter, r *http.Request) {
+	userId := 0
 	vars := mux.Vars(r)
 
 	username := vars["username"]
+	if username == "metrics" {
+		return
+	}
 
 	session, _ := store.Get(r, "session1")
 
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userId"].(int)
+		userId = session.Values["userId"].(int)
 	}
 	profileuser := dto.GetUser(username)
-	user := dto.GetUsername(user_id)
+	user := dto.GetUsername(userId)
 
 	if profileuser.Username != "" {
-		followed := dto.IsFollowing(user_id, profileuser.UserId)
+		followed := dto.IsFollowing(userId, profileuser.UserId)
 
 		var timelines = dto.GetUserTimeline(profileuser.UserId)
 
-		templ := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tmp.html"))
+		templ := template.Must(template.ParseFiles(layout, tmp))
 
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":     timelines,
@@ -155,7 +164,7 @@ func User_timeline(w http.ResponseWriter, r *http.Request) {
 			"followed":     followed,
 			"visiting":     true,
 			"type":         "user",
-			"sess_u_id":    user_id,
+			"sess_u_id":    userId,
 			"loggedinuser": user == profileuser.Username,
 		})
 		if err != nil {
@@ -163,83 +172,80 @@ func User_timeline(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		http.Error(w, "User not found", 404)
+		http.Error(w, noUserFound, 404)
 	}
 }
 
-func Follow_user(w http.ResponseWriter, r *http.Request) {
-	user_id := 0
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+	userId := 0
 	vars := mux.Vars(r)
 
 	username := vars["username"]
 
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userId"].(int)
+		userId = session.Values["userId"].(int)
 	}
-	if user_id == 0 {
-		http.Error(w, "not authorized", 401)
+	if userId == 0 {
+		http.Error(w, notAuth, http.StatusUnauthorized)
 	} else {
-		whom_id := dto.GetUserID(username)
-		if whom_id == 0 {
-			http.Error(w, "User not found", 404)
+		whomId := dto.GetUserID(username)
+		if whomId == 0 {
+			http.Error(w, noUserFound, 404)
 		}
-		dto.FollowUser(user_id, whom_id)
-		metrics.IncrementFollows()
+		dto.FollowUser(userId, whomId)
 		dialog.Alert("You are now following %s", username)
-		http.Redirect(w, r, "/"+username, 302)
+		http.Redirect(w, r, "/"+username, http.StatusFound)
 	}
 }
 
-func Unfollow_user(w http.ResponseWriter, r *http.Request) {
-	user_id := 0
+func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+	userId := 0
 	vars := mux.Vars(r)
 
 	username := vars["username"]
 
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userId"].(int)
+		userId = session.Values["userId"].(int)
 	}
-	if user_id == 0 {
-		http.Error(w, "not authorized", 401)
+	if userId == 0 {
+		http.Error(w, notAuth, http.StatusUnauthorized)
 	} else {
-		whom_id := dto.GetUserID(username)
-		if whom_id == 0 {
-			http.Error(w, "User not found", 404)
+		whomId := dto.GetUserID(username)
+		if whomId == 0 {
+			http.Error(w, noUserFound, 404)
 		}
-		dto.UnfollowUser(user_id, whom_id)
-		metrics.IncrementUnfollows()
+		dto.UnfollowUser(userId, whomId)
 		dialog.Alert("You are no longer following %s", username)
-		http.Redirect(w, r, "/"+username, 302)
+		http.Redirect(w, r, "/"+username, http.StatusFound)
 	}
 }
 
-func Add_message(w http.ResponseWriter, r *http.Request) {
-	user_id := 0
+func AddMessage(w http.ResponseWriter, r *http.Request) {
+	userId := 0
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		user_id = session.Values["userId"].(int)
+		userId = session.Values["userId"].(int)
 	}
-	if user_id == 0 {
-		http.Error(w, "not authorized", 401)
+	if userId == 0 {
+		http.Error(w, notAuth, http.StatusUnauthorized)
 	} else {
 		text := r.FormValue("text")
-		dto.AddMessage(strconv.Itoa(user_id), text, time.Now(), 0)
+		dto.AddMessage(strconv.Itoa(userId), text, time.Now(), 0)
 		dialog.Alert("Your message was recorded")
-		http.Redirect(w, r, "/", 302)
-		log.Println("message recorded")
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	register, err := template.ParseFiles("./templates/layout.html", "./templates/register.html")
+	register, err := template.ParseFiles(layout, register)
 	if err != nil {
 		println(err.Error())
 	}
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		err = register.Execute(w, nil)
 		if err != nil {
@@ -263,21 +269,21 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 		err += "You have to enter a password\n"
 	} else if password != password2 {
 		err += "The two passwords do not match\n"
-	} else if dto.GetUserID(username) > 0 { //this might have to be another check at some point
+	} else if dto.GetUserID(username) > 0 {
 		err += "The username is already taken"
 	} else {
-		pw_hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+		pwHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 		if err != nil {
 			println(err.Error())
 		} else {
-			image := helper.Gravatar_url(email)
-			dto.RegisterUser(username, email, string(pw_hash), image)
+			image := helper.GravatarUrl(email)
+			dto.RegisterUser(username, email, string(pwHash), image)
 			fmt.Println(w, "You were successfully registered and can login now")
-			http.Redirect(w, r, "/login", 302)
+			http.Redirect(w, r, "/login", http.StatusFound)
 		}
 	}
 
-	register, err2 := template.ParseFiles("./templates/layout.html", "./templates/register.html")
+	register, err2 := template.ParseFiles(layout, register)
 	if err2 != nil {
 		println(err2.Error())
 	}
@@ -295,5 +301,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = false
 	session.Values["userId"] = ""
 	session.Save(r, w)
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/", http.StatusFound)
 }

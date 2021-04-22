@@ -1,6 +1,7 @@
 github.com/
 golang.org/
 tawesoft.co.uk/
-src/db/
+program/db/
+api/db/
 .vagrant/
 .env
