@@ -59,17 +59,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Before running deploy script
-      uses: matheusvanzan/sshpass-action@v2
+      uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
-        user: ${{ secrets.SERVER_USER }}
+        username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PASS }}
-        run: |
-          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/docker-compose.yml ${user}@${host}:/vagrant/
-          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/prometheus.yml ${user}@${host}:/vagrant/
-          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/filebeat.yml ${user}@${host}:/vagrant/
-          sudo chown root filebeat.yml 
-          sudo chmod go-w filebeat.yml
+        source: "remote_files/docker-compose.yml,remote_files/prometheus.yml,remote_files/filebeat.yml"
+        target: "/vagrant/"
+    
+    - name: Starting filebeat
+      run: |
+          sudo chown root remote_files/filebeat.yml 
+          sudo chmod go-w remote_files/filebeat.yml
     
     - name: Deploying
       uses: actions/github-script@v4
