@@ -32,14 +32,15 @@ jobs:
 
     - name: Build API
       working-directory: ./api
-      run: go build 
+      run: |
+        go build
+        go vet ./...
+        golint ./...
       
     - name: Build program
       working-directory: ./program
-      run: go build 
-
-    - name: Run vet & lint
       run: |
+        go build
         go vet ./...
         golint ./...
         
