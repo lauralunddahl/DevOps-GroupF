@@ -64,13 +64,13 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PASS }}
-        source: "remote_files/docker-compose.yml,remote_files/prometheus.yml,remote_files/filebeat.yml"
-        target: "/vagrant/"
+        source: "docker-compose.yml,prometheus.yml,filebeat.yml"
+        target: "/vagrant"
     
     - name: Starting filebeat
       run: |
-          sudo chown root remote_files/filebeat.yml 
-          sudo chmod go-w remote_files/filebeat.yml
+          sudo chown root filebeat.yml 
+          sudo chmod go-w filebeat.yml
     
     - name: Deploying
       uses: appleboy/ssh-action@master
