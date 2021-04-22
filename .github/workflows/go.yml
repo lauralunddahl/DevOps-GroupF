@@ -61,14 +61,13 @@ jobs:
     - name: Before running deploy script
       uses: matheusvanzan/sshpass-action@v2
       with:
-        MT_SERVER: ${{ secrets.SERVER_HOST }}
-        MT_USER: ${{ secrets.SERVER_USER }}
-        SSH_PRIVATE: ${{ secrets.SSH_PASS }}
+        host: ${{ secrets.SERVER_HOST }}
+        user: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PASS }}
         run: |
-          export SSHPASS=${SSH_PRIVATE}
-          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/docker-compose.yml ${MT_USER}@${MT_SERVER}:/vagrant/
-          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/prometheus.yml ${MT_USER}@${MT_SERVER}:/vagrant/
-          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/filebeat.yml ${MT_USER}@${MT_SERVER}:/vagrant/
+          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/docker-compose.yml ${user}@${host}:/vagrant/
+          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/prometheus.yml ${user}@${host}:/vagrant/
+          sshpass -e scp -o "StrictHostKeyChecking no" remote_files/filebeat.yml ${user}@${host}:/vagrant/
           sudo chown root filebeat.yml 
           sudo chmod go-w filebeat.yml
     
