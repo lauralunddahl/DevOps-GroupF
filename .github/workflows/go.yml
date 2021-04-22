@@ -45,10 +45,9 @@ jobs:
         go vet ./...
         golint ./...
         
-    #- uses: docker/build-push-action@v1
-    - name: build and push docker
+    - name: Build and push docker
       run: |
-        echo ${DOCKER_PASSWORD} | docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} --password-stdin
+        echo ${DOCKER_PASSWORD} | winpty docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} --password-stdin
         docker build -t ${DOCKER_USERNAME}/minitwitimage:latest . -f Dockerfile-program
         docker build -t ${DOCKER_USERNAME}/minitwitapi:latest . -f Dockerfile-api
         docker push ${DOCKER_USERNAME}/minitwitimage:latest
@@ -59,7 +58,7 @@ jobs:
     needs: [build]
     steps:
     - uses: actions/checkout@v2
-    - name: before script
+    - name: Before running deploy script
       uses: matheusvanzan/sshpass-action@v2
       with:
         MT_SERVER: ${{ secrets.SERVER_HOST }}
@@ -72,6 +71,7 @@ jobs:
           sshpass -e scp -o "StrictHostKeyChecking no" remote_files/filebeat.yml ${MT_USER}@${MT_SERVER}:/vagrant/
           sudo chown root filebeat.yml 
           sudo chmod go-w filebeat.yml
+    - name: Deploying
     - uses: actions/github-script@v4
       with:
         script: |
