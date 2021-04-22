@@ -77,11 +77,11 @@ jobs:
       with:
         script: |
           ssh -o "StrictHostKeyChecking no" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
-          "cd /vagrant && \
+          cd /vagrant && \
           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} > .env && \
           docker-compose down && \
           docker-compose pull && \
-          docker-compose up -d"
+          docker-compose up -d
     
 
   
