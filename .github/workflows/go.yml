@@ -47,12 +47,9 @@ jobs:
     #- uses: docker/build-push-action@v1
     - name: build and push docker
       run: |
-        echo "LOGIN"
         echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-        echo "BUILD"
         docker build -t ${DOCKER_USERNAME}/minitwitimage:latest . -f Dockerfile-program
         docker build -t ${DOCKER_USERNAME}/minitwitapi:latest . -f Dockerfile-api
-        echo "PUSH"
         docker push ${DOCKER_USERNAME}/minitwitimage:latest
         docker push ${DOCKER_USERNAME}/minitwitapi:latest
   
