@@ -30,7 +30,12 @@ jobs:
         go get -u golang.org/x/lint/golint
         docker --version
 
-    - name: Build
+    - name: Build API
+      working-directory: ./api
+      run: go build 
+      
+    - name: Build program
+      working-directory: ./program
       run: go build 
 
     - name: Run vet & lint
