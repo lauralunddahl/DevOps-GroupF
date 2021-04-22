@@ -73,7 +73,7 @@ jobs:
           sudo chmod go-w filebeat.yml
     
     - name: Deploying
-    - uses: actions/github-script@v4
+      uses: actions/github-script@v4
       with:
         script: |
           ssh -o "StrictHostKeyChecking no" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
