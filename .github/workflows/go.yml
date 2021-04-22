@@ -44,7 +44,7 @@ jobs:
         go vet ./...
         golint ./...
         
-    - uses: docker/build-push-action@v1
+    #- uses: docker/build-push-action@v1
     - name: build and push docker
       run: |
         echo "LOGIN"
