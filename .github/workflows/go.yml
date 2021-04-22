@@ -47,7 +47,7 @@ jobs:
         
     - name: Build and push docker
       run: |
-        echo ${DOCKER_PASSWORD} | winpty docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} --password-stdin
+        echo ${DOCKER_PASSWORD} | docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} --password-stdin
         docker build -t ${DOCKER_USERNAME}/minitwitimage:latest . -f Dockerfile-program
         docker build -t ${DOCKER_USERNAME}/minitwitapi:latest . -f Dockerfile-api
         docker push ${DOCKER_USERNAME}/minitwitimage:latest
@@ -71,6 +71,7 @@ jobs:
           sshpass -e scp -o "StrictHostKeyChecking no" remote_files/filebeat.yml ${MT_USER}@${MT_SERVER}:/vagrant/
           sudo chown root filebeat.yml 
           sudo chmod go-w filebeat.yml
+    
     - name: Deploying
     - uses: actions/github-script@v4
       with:
