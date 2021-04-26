@@ -68,8 +68,8 @@ jobs:
     
     - name: Starting filebeat
       run: |
-          sudo chown root filebeat.yml 
-          sudo chmod go-w filebeat.yml
+          sudo chown root ../filebeat.yml 
+          sudo chmod go-w ../filebeat.yml
     
     - name: Deploying
       uses: appleboy/ssh-action@master
