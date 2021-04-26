@@ -43,6 +43,11 @@ jobs:
         go build
         go vet ./...
         golint ./...
+
+    - name: Starting filebeat
+      run: |
+          sudo chown root filebeat.yml 
+          sudo chmod go-w filebeat.yml
         
     - name: Build and push docker
       run: |
@@ -65,11 +70,6 @@ jobs:
         key: ${{ secrets.SSH_PASS }}
         source: "docker-compose.yml,prometheus.yml,filebeat.yml"
         target: "/vagrant"
-    
-    - name: Starting filebeat
-      run: |
-          sudo chown root ../filebeat.yml 
-          sudo chmod go-w ../filebeat.yml
     
     - name: Deploying
       uses: appleboy/ssh-action@master
