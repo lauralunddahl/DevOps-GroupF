@@ -48,7 +48,7 @@ func PrivateTimeline(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session1")
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Redirect(w, r, "/public", http.StatusOK)
+		http.Redirect(w, r, "/public", http.StatusFound)
 	} else {
 		userId := session.Values["userId"].(int)
 		var timelines = dto.GetPrivateTimeline(userId)
