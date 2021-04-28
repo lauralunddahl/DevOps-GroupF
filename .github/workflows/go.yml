@@ -87,8 +87,8 @@ jobs:
     - name: Deploying 1
       uses: appleboy/ssh-action@0.1.4
       with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER1 }}
+        host: ${{ secrets.SERVER_USER1 }}
+        username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PASS }}
         script: |
           cd /vagrant && \
@@ -100,8 +100,8 @@ jobs:
     - name: Deploying 2
       uses: appleboy/ssh-action@0.1.4
       with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER2 }}
+        host: ${{ secrets.SERVER_USER2 }}
+        username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PASS }}
         script: |
           cd /vagrant && \
