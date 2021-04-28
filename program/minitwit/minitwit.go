@@ -48,7 +48,7 @@ func PrivateTimeline(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session1")
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Redirect(w, r, "/public", http.StatusFound)
+		http.Redirect(w, r, "/public", http.StatusOK)
 	} else {
 		userId := session.Values["userId"].(int)
 		var timelines = dto.GetPrivateTimeline(userId)
@@ -100,7 +100,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = true
 	session.Values["userId"] = user.UserId
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusOK)
 }
 
 func userLoggedin(r *http.Request) bool {
@@ -195,7 +195,7 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		}
 		dto.FollowUser(userId, whomId)
 		dialog.Alert("You are now following %s", username)
-		http.Redirect(w, r, "/"+username, http.StatusFound)
+		http.Redirect(w, r, "/"+username, http.StatusOK)
 	}
 }
 
@@ -218,7 +218,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		}
 		dto.UnfollowUser(userId, whomId)
 		dialog.Alert("You are no longer following %s", username)
-		http.Redirect(w, r, "/"+username, http.StatusFound)
+		http.Redirect(w, r, "/"+username, http.StatusOK)
 	}
 }
 
@@ -234,7 +234,7 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		text := r.FormValue("text")
 		dto.AddMessage(strconv.Itoa(userId), text, time.Now(), 0)
 		dialog.Alert("Your message was recorded")
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/", http.StatusOK)
 	}
 }
 
@@ -245,7 +245,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/", http.StatusOK)
 	} else {
 		err = register.Execute(w, nil)
 		if err != nil {
@@ -279,7 +279,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 			image := helper.GravatarUrl(email)
 			dto.RegisterUser(username, email, string(pwHash), image)
 			fmt.Println(w, "You were successfully registered and can login now")
-			http.Redirect(w, r, "/login", http.StatusFound)
+			http.Redirect(w, r, "/login", http.StatusOK)
 		}
 	}
 
@@ -301,5 +301,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = false
 	session.Values["userId"] = ""
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusOK)
 }
