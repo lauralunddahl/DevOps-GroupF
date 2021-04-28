@@ -19,7 +19,7 @@ func init() {
 		fmt.Println("Not running locally")
 	}
 	password := os.Getenv("DB_PASSWORD")
-	database, err := gorm.Open(mysql.Open("fibonacci:" + password + "@(mydb.itu.dk)/minitwit?charset=utf8&parseTime=True&loc=Local"))
+	database, err := gorm.Open(mysql.Open("fibonacci:" + password + "@(minitwit-mysql-db-do-user-8729061-0.b.db.ondigitalocean.com:25060)/defaultdb?charset=utf8&parseTime=True&loc=Local"))
 	//database, err := gorm.Open(mysql.Open("**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local"))
 
 	if err != nil {
