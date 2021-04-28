@@ -83,6 +83,32 @@ jobs:
           docker-compose down && \
           docker-compose pull && \
           docker-compose up -d
+
+    - name: Deploying 1
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER1 }}
+        key: ${{ secrets.SSH_PASS }}
+        script: |
+          cd /vagrant && \
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} > .env && \
+          docker-compose down && \
+          docker-compose pull && \
+          docker-compose up -d
+
+    - name: Deploying 2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER2 }}
+        key: ${{ secrets.SSH_PASS }}
+        script: |
+          cd /vagrant && \
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} > .env && \
+          docker-compose down && \
+          docker-compose pull && \
+          docker-compose up -d
     
 
 
