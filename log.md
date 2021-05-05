@@ -49,3 +49,4 @@ This allows us to integrate our code often, into our master branch, from which w
 We have chosen to use Travis CI as our CI tool. Travis was chosen as it is easy to integrate with our GitHub, it offers many
 automated features/options and it is cloud based which means we do not need to run and maintain a server for it.
 
+To remove images with tag <none>: ```docker images | grep none | awk '{ print $3; }' | xargs docker rmi
