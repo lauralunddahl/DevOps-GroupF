@@ -72,7 +72,7 @@ services:
         - "5601:5601"
         environment:
             elasticsearch.hosts: '["http://elasticsearch:9200"]'
-            #server.host: "0.0.0.0"
+            server.host: "0.0.0.0"
         depends_on:
         - elasticsearch
         networks:
