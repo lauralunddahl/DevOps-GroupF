@@ -6,7 +6,6 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/lauralunddahl/DevOps-GroupF/api/handler"
-	logging "github.com/lauralunddahl/DevOps-GroupF/api/logging"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/api/metrics"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -22,7 +21,6 @@ func main() {
 
 	metrics.RecordMetrics()
 	apirouter.Handle("/metrics", promhttp.Handler())
-	logging.Logging()
 
 	log.Fatal(http.ListenAndServe(":8081", apirouter))
 }
