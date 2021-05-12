@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	dto "github.com/lauralunddahl/DevOps-GroupF/program/dto"
@@ -21,7 +20,6 @@ var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
-
 	layout      = "./templates/layout.html"
 	tmp         = "./templates/tmp.html"
 	login       = "./templates/login.html"
@@ -39,7 +37,6 @@ func BeforeRequest(handler func(w http.ResponseWriter, r *http.Request)) func(w 
 		if err != nil {
 			println(err.Error())
 		}
-
 		handler(w, r)
 	}
 }
@@ -52,7 +49,6 @@ func PrivateTimeline(w http.ResponseWriter, r *http.Request) {
 	} else {
 		userId := session.Values["userId"].(int)
 		var timelines = dto.GetPrivateTimeline(userId)
-
 		templ := template.Must(template.ParseFiles(layout, tmp))
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":  timelines,
@@ -87,7 +83,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	if user.Username == "" {
 		fmt.Fprintln(w, "invalid username")
 	}
-	//check password hash from database against input password from user
 	byteHash := []byte(user.PwHash)
 	bytePw := []byte(password)
 	err := bcrypt.CompareHashAndPassword(byteHash, bytePw)
@@ -95,7 +90,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		println(err.Error())
 		fmt.Fprintln(w, "invalid password")
 	}
-
 	session, _ := store.Get(r, "session1")
 	session.Values["authenticated"] = true
 	session.Values["userId"] = user.UserId
@@ -120,7 +114,6 @@ func userLoggedin(r *http.Request) bool {
 func PublicTimeline(w http.ResponseWriter, r *http.Request) {
 	var timelines = dto.GetPublicTimeline()
 	templ := template.Must(template.ParseFiles(layout, tmp))
-
 	err := templ.Execute(w, map[string]interface{}{
 		"timeline": timelines,
 		"public":   true,
@@ -135,14 +128,12 @@ func PublicTimeline(w http.ResponseWriter, r *http.Request) {
 func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	userId := 0
 	vars := mux.Vars(r)
-
 	username := vars["username"]
 	if username == "metrics" {
 		return
 	}
 
 	session, _ := store.Get(r, "session1")
-
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		userId = session.Values["userId"].(int)
 	}
@@ -151,11 +142,8 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	if profileuser.Username != "" {
 		followed := dto.IsFollowing(userId, profileuser.UserId)
-
 		var timelines = dto.GetUserTimeline(profileuser.UserId)
-
 		templ := template.Must(template.ParseFiles(layout, tmp))
-
 		err := templ.Execute(w, map[string]interface{}{
 			"timeline":     timelines,
 			"public":       false,
@@ -170,7 +158,6 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Fprintln(w, err)
 		}
-
 	} else {
 		http.Error(w, noUserFound, 404)
 	}
@@ -179,9 +166,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 func FollowUser(w http.ResponseWriter, r *http.Request) {
 	userId := 0
 	vars := mux.Vars(r)
-
 	username := vars["username"]
-
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		userId = session.Values["userId"].(int)
@@ -202,9 +187,7 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	userId := 0
 	vars := mux.Vars(r)
-
 	username := vars["username"]
-
 	session, _ := store.Get(r, "session1")
 	if auth, _ := session.Values["authenticated"].(bool); auth {
 		userId = session.Values["userId"].(int)
@@ -278,7 +261,6 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 		} else {
 			image := helper.GravatarUrl(email)
 			dto.RegisterUser(username, email, string(pwHash), image)
-			fmt.Println(w, "You were successfully registered and can login now")
 			http.Redirect(w, r, "/login", http.StatusOK)
 		}
 	}

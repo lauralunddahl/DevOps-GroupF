@@ -3,7 +3,6 @@ package metrics
 import (
 	"strings"
 	"time"
-
 	dto "github.com/lauralunddahl/DevOps-GroupF/api/dto"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -12,7 +11,6 @@ import (
 )
 
 const interval = 5
-
 var bytesToGigabytes = float64(1073741824)
 
 //Prometheus objects needed as global variables:

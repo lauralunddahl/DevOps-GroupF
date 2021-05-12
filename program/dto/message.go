@@ -2,7 +2,6 @@ package dto
 
 import (
 	"time"
-
 	database "github.com/lauralunddahl/DevOps-GroupF/program/db"
 	log "github.com/sirupsen/logrus"
 )

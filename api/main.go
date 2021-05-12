@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-
 	"github.com/gorilla/mux"
 	api "github.com/lauralunddahl/DevOps-GroupF/api/handler"
 	logging "github.com/lauralunddahl/DevOps-GroupF/api/logging"

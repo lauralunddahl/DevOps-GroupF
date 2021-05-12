@@ -3,7 +3,6 @@ package dto
 import (
 	"strconv"
 	"time"
-
 	database "github.com/lauralunddahl/DevOps-GroupF/program/db"
 	log "github.com/sirupsen/logrus"
 )
@@ -14,7 +13,6 @@ type Timeline struct {
 	Email    string
 	PwHash   string
 	Image    string
-
 	MessageId int
 	AuthorId  int
 	Text      string

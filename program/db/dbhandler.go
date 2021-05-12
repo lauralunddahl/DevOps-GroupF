@@ -3,9 +3,7 @@ package db
 import (
 	"fmt"
 	"os"
-
 	"gorm.io/gorm"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -20,7 +18,6 @@ func init() {
 	}
 	password := os.Getenv("DB_PASSWORD")
 	database, err := gorm.Open(mysql.Open("fibonacci:" + password + "@(minitwit-mysql-db-do-user-8729061-0.b.db.ondigitalocean.com:25060)/defaultdb?charset=utf8&parseTime=True&loc=Local"))
-	//database, err := gorm.Open(mysql.Open("**REMOVED**:**REMOVED**@(mydb.itu.dk)/minitwit_test?charset=utf8&parseTime=True&loc=Local"))
 
 	if err != nil {
 		fmt.Println(err)

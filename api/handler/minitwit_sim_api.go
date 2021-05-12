@@ -6,12 +6,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	dto "github.com/lauralunddahl/DevOps-GroupF/api/dto"
 	metrics "github.com/lauralunddahl/DevOps-GroupF/api/metrics"
 	helper "github.com/lauralunddahl/DevOps-GroupF/api/helper"
 	log "github.com/sirupsen/logrus"
-
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -49,7 +47,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		err += "You have to enter a valid email address\n"
 	} else if len(newReg.Password) == 0 {
 		err += "You have to enter a password\n"
-	} else if dto.GetUserID(newReg.Username) > 0 { //this might have to be another check at some point
+	} else if dto.GetUserID(newReg.Username) > 0 { 
 		err += "The username is already taken"
 	}
 	var res Response
@@ -80,12 +78,11 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 func Messages(w http.ResponseWriter, r *http.Request) {
 	updateLatest(w, r)
 	metrics.IncrementRequests()
-
 	noMsg := r.URL.Query().Get("no")
 	if noMsg == "" {
 		noMsg = "100"
 	}
-	var timelines = dto.GetPublicTimeline() //update to noMsg
+	var timelines = dto.GetPublicTimeline() 
 	var messages []ApiMessage
 	for _, t := range timelines {
 		var message ApiMessage
@@ -103,12 +100,10 @@ func MessagesPerUser(w http.ResponseWriter, r *http.Request) {
 	metrics.IncrementRequests()
 	vars := mux.Vars(r)
 	username := vars["username"]
-
 	noMsg := r.URL.Query().Get("no")
 	if noMsg == "" {
 		noMsg = "100"
 	}
-
 	switch r.Method {
 	case "GET":
 		userId := dto.GetUserID(username)
@@ -119,7 +114,7 @@ func MessagesPerUser(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			log.Info("User id for user " + username + " was not found")
 		} else {
-			var timelines = dto.GetUserTimeline(userId) //update to noMsg
+			var timelines = dto.GetUserTimeline(userId)
 			var messages []ApiMessage
 			for _, t := range timelines {
 				var message ApiMessage
@@ -149,15 +144,12 @@ func MessagesPerUser(w http.ResponseWriter, r *http.Request) {
 func Follow(w http.ResponseWriter, r *http.Request) {
 	updateLatest(w, r)
 	metrics.IncrementRequests()
-
 	vars := mux.Vars(r)
 	username := vars["username"]
-
 	noFollowers := r.URL.Query().Get("no")
 	if noFollowers == "" {
 		noFollowers = "100"
 	}
-
 	userId := dto.GetUserID(username)
 	if userId == 0 {
 		var res Response
