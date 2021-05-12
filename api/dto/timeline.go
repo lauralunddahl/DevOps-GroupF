@@ -3,7 +3,6 @@ package dto
 import (
 	"strconv"
 	"time"
-
 	database "github.com/lauralunddahl/DevOps-GroupF/api/db"
 	log "github.com/sirupsen/logrus"
 )

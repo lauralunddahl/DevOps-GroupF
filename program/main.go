@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-
 	"github.com/gorilla/mux"
 	minitwit "github.com/lauralunddahl/DevOps-GroupF/program/minitwit"
 )
