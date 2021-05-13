@@ -3,13 +3,29 @@ services:
     minitwit:
         image: nannamarcher/minitwitimage:latest
         container_name: minitwit_container
-        build: .
+        build:
+            context: .
+            dockerfile: Dockerfile-program
         ports:
             - "8080:8080"
+        restart: always
+        networks:
+            - minitwit
+        env_file:
+            - .env
+    minitwit-api:
+        image: nannamarcher/minitwitapi:latest
+        container_name: minitwit_api
+        build: 
+            context: .
+            dockerfile: Dockerfile-api
+        ports:
             - "8081:8081"
         restart: always
         networks:
             - minitwit
+        env_file:
+            - .env
 
     prometheus:
         image: prom/prometheus
@@ -56,6 +72,7 @@ services:
         - "5601:5601"
         environment:
             elasticsearch.hosts: '["http://elasticsearch:9200"]'
+            server.host: "0.0.0.0"
         depends_on:
         - elasticsearch
         networks:
@@ -82,4 +99,3 @@ networks:
 volumes:
   grafana-storage:
   elk_elasticsearch_data:
-    

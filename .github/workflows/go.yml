@@ -1,0 +1,126 @@
+name: Go
+
+on:
+  push:
+    branches: 
+    - master
+  pull_request:
+    branches: 
+    - master
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+        DOCKER_REGISTRY: docker.io
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.13.8
+    
+    - name: Install dependencies
+      run: |
+        go version
+        go get -u golang.org/x/lint/golint
+        docker --version
+
+    - name: Build API
+      working-directory: ./api
+      run: |
+        go build
+        go vet ./...
+        golint ./...
+      
+    - name: Build program
+      working-directory: ./program
+      run: |
+        go build
+        go vet ./...
+        golint ./...
+
+    - name: Starting filebeat
+      run: |
+          sudo chown root filebeat.yml 
+          sudo chmod go-w filebeat.yml
+        
+    - name: Build and push docker
+      run: |
+        echo ${DOCKER_PASSWORD} | docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} --password-stdin
+        docker build -t ${DOCKER_USERNAME}/minitwitimage:latest . -f Dockerfile-program
+        docker build -t ${DOCKER_USERNAME}/minitwitapi:latest . -f Dockerfile-api
+        docker push ${DOCKER_USERNAME}/minitwitimage:latest
+        docker push ${DOCKER_USERNAME}/minitwitapi:latest
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Before running deploy script
+      uses: appleboy/scp-action@master
+      with:
+        host: "${{ secrets.SERVER_HOST }},${{ secrets.SERVER_USER1 }},${{ secrets.SERVER_USER2 }}"
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PASS }}
+        source: "docker-compose.yml,prometheus.yml,filebeat.yml"
+        target: "/vagrant"
+    
+    - name: Deploying
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PASS }}
+        script: |
+          cd /vagrant && \
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} > .env && \
+          docker-compose down && \
+          docker-compose pull && \
+          docker-compose up -d
+
+    - name: Deploying 1
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_HOST1 }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PASS }}
+        script: |
+          cd /vagrant && \
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} > .env && \
+          docker-compose down && \
+          docker-compose pull && \
+          docker-compose up -d
+
+    - name: Deploying 2
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_HOST2 }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PASS }}
+        script: |
+          cd /vagrant && \
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} > .env && \
+          docker-compose down && \
+          docker-compose pull && \
+          docker-compose up -d
+    
+
+
+  
+  
+  
+  
+  
+
+
+
+
+
+
+

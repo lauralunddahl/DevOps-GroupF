@@ -1,0 +1,49 @@
+<!doctype html>
+{{define "body"}}
+<h2> {{if eq "public" (.type)}}
+    Public Timeline
+  {{ else if eq "user" (.type) }}
+    {{ .profileuser.Username }}'s Timeline
+  {{ else }}
+    My Timeline
+  {{ end }}</h2>
+  {{ if .loggedin }}
+      {{ if .visiting }}
+        <div class=followstatus>
+        {{ if .loggedinuser }}
+          This is you!
+        {{ else if .followed }}
+          You are currently following this user.
+          <a class=unfollow href="/{{.profileuser.Username}}/unfollow">Unfollow user</a>.
+        {{ else }}
+          You are not yet following this user.
+          <a class=follow href="/{{.profileuser.Username}}/follow">Follow user</a>.
+        {{ end }}
+        </div>
+      {{else if eq "default" .type }}
+        <div class=twitbox>
+          <h3>What's on your mind {{ .username }}?</h3>
+          <form action="/add_message" method=post>
+            <p><input type=text name=text size=60>
+              <input type=submit value="Share">
+          </form>
+        </div>
+      {{end}}
+  {{end}}
+  <ul class=messages>
+    <div>
+    {{if eq 0 (len .timeline)}}
+        <li><em>There's no message so far.</em></li>
+    {{else}}
+          {{ range .timeline }}
+          <li><img src="{{.Image}}"alt="picture"><p> 
+            <strong><a href="/{{.Username}}">{{ .Username }}</a></strong>
+            {{.Text}}
+            <small>&mdash; {{ .PubDate }}</small> 
+          </li>
+          {{end}}
+
+    </div>
+    {{end}}
+  </ul>  
+{{end}}

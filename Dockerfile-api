@@ -1,0 +1,17 @@
+FROM golang:latest
+
+#RUN apk update && apk upgrade && apk add --no-cache git
+
+WORKDIR ./api
+
+COPY ./api .
+
+COPY ./api/go.mod .
+COPY ./api/go.sum .
+RUN go mod download
+
+RUN GOOS=linux go build -o ./out/minitwit-api
+
+EXPOSE 8081
+
+CMD ["./out/minitwit-api"]
