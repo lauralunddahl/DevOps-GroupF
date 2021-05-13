@@ -2,16 +2,17 @@ name: Report to PDF
 
 on:
   push:
-    branches: 
-    - reportsetup
+    paths:
+      - 'report/report.md'
 
 jobs:
   convert:
+    name: Create report PDF
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      - name: convert md to pdf
+      - name: Convert markdown to PDF
         uses: baileyjm02/markdown-to-pdf@v1
         with:
           input_dir: report
@@ -19,19 +20,19 @@ jobs:
           images_dir: report/images
           image_import: ./images
           build_html: false
-      - name: commit pdf
+      - name: Commit PDF
         run: |
           git config --local user.email "nanm@itu.dk"
           git config --local user.name "NannaMarcher"
           cd report/build
           git add report.pdf
           git commit -m "updated report pdf"
-      - name: push report changes
+      - name: Push report changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: reportsetup
-      - name: upload pdf
+          branch: ${{ github.ref }}
+      - name: Upload PDF
         uses: actions/upload-artifact@v1
         with:
           name: report
