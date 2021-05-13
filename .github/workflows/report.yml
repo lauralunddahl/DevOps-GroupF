@@ -12,7 +12,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: convert md to pdf
-      - uses: baileyjm02/markdown-to-pdf@v1
+        uses: baileyjm02/markdown-to-pdf@v1
         with:
           input_dir: report
           output_dir: report/build
@@ -31,7 +31,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: reportsetup
-      - uses: actions/upload-artifact@v1
+      - name: upload pdf
+        uses: actions/upload-artifact@v1
         with:
           name: report
           path: report/build
