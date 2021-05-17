@@ -6,11 +6,11 @@ To *make our work visible* we are using a board on github for tasks, in order to
 
 In regards to *Limit work in process (WIP)* we do not have an agreement for how many tasks must be in the work in progress bar. But generally when someone is taking long on a task other members of the group try to help to ensure that the task can be completed. 
 
-In regards to *Reduce batch sizes* we do not have continuous deployment at the moment, with trying to deploy smaller parts and see how they work. At the end of the week everything made during the week is gathered for the deployment. But the plan is to figure out something with continuous deployment using Travis. 
+In regards to *Reduce batch sizes* we do not have continuous deployment at the moment, with trying to deploy smaller parts and see how they work. At the end of the week everything made during the week is gathered for the deployment. But the plan is to figure out something with continuous deployment using Travis. UPDATE: We now have continous deployment with GitHub Actions. 
 
 In regards to *Reduce the number of handoffs* we are in the process of automating things but have not managed to do much yet. But since we are only one team, and things don’t have to go between teams it has not really been much of a problem, since every member of the team has the same skillset. 
 
-In regards to *Continually identify and elevate our constraints*, we are still missing a lot of automated steps in regards to deployments and test setup. 
+In regards to *Continually identify and elevate our constraints*, we are still missing a lot of automated steps in regards to deployments and test setup. UPDATE: Some static analysis tools has been setup and CI/CD with GitHub Actions.
 
 *Eliminate hardship and waste in the value stream*, is not something we have yet to consider. But we have run into problems with partially done work, waiting, defects which should definitely be something to try and lessen.
 
