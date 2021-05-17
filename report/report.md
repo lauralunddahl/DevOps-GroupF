@@ -6,6 +6,8 @@
 </b></center>
 <center><h3>Spring 2021</h3></center>
 
+<div style="page-break-after: always;"></div>
+
 # Introduction
 This report covers the process of designing, developing and maintaining a system throughout the course <i>DevOps, Software Evolution and Software Maintenance</i>, while aiming to learn the practices of DevOps.
 
