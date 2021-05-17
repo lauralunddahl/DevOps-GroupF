@@ -1,7 +1,7 @@
 # DevOps-GroupF
 
 ## Important links:
-- Final report: [report.md](https://github.com/lauralunddahl/DevOps-GroupF/blob/master/report/build/report.pdf)
+- Final report: [report.pdf](https://github.com/lauralunddahl/DevOps-GroupF/blob/master/report/build/report.pdf)
 - Site: http://144.126.246.205:8080
 - API: http://144.126.246.205:8081
 - Logging: http://144.126.246.205:5601
