@@ -38,7 +38,6 @@ Figure 3 shows the <i>deployment view</i> of the system including how the system
   <figcaption>Figure 3: Deployment View</figcaption>
 </figure>
 
-
 ## Dependencies
 
 Figure 4 shows the direct dependencies of the system including each tool’s [version] and license.
