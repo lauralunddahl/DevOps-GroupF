@@ -19,14 +19,14 @@ This section describes the design and architecture of our system through the 3+1
 
 Figure 1 shows the <i>module view</i> of our system in a <i>package diagram</i>. The Minitwit system is built around two packages: The API, and the Web Application. Each of these two packages includes respectively four packages. 
 <figure>
-  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/master/report/images/package.png" alt="package_view" style="width:100%">
+  <img src="report/images/package.png" alt="package_view" style="width:100%">
   <figcaption>Figure 1: Package Diagram</figcaption>
 </figure>
 
 
 Figure 2 shows the <i>component and connector view</i> of the system. Here it is shown that the system is accessible through the API with a simulator and the browser. 
 <figure>
-  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/master/report/images/Component%26Connector.png" alt="component_connector_view" style="width:100%">
+  <img src="Component&Connector.png" alt="component_connector_view" style="width:100%">
   <figcaption>Figure 2: Component and Connector View</figcaption>
 </figure>
 
