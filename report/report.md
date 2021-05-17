@@ -26,7 +26,7 @@ Figure 1 shows the <i>module view</i> of our system in a <i>package diagram</i>.
 
 Figure 2 shows the <i>component and connector view</i> of the system. Here it is shown that the system is accessible through the API with a simulator and the browser. 
 <figure>
-  <img src="Component&Connector.png" alt="component_connector_view" style="width:100%">
+  <img src="report/images/Component&Connector.png" alt="component_connector_view" style="width:100%">
   <figcaption>Figure 2: Component and Connector View</figcaption>
 </figure>
 
