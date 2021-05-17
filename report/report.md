@@ -20,32 +20,36 @@ This section describes the design and architecture of our system through the 3+1
 
 Figure 1 shows the <i>module view</i> of our system in a <i>package diagram</i>. The Minitwit system is built around two packages: The API, and the Web Application. Each of these two packages includes respectively four packages. 
 <figure>
-  <img src="./images/package.png" alt="package_view" style="width:50%">
+  <img src="./images/package.png" alt="package_view" style="width:100%">
   <figcaption>Figure 1: Package Diagram</figcaption>
 </figure>
 
 
+
 Figure 2 shows the <i>component and connector view</i> of the system. Here it is shown that the system is accessible through the API with a simulator and the browser. 
 <figure>
-  <img src="./images/Component&Connector.png" alt="component_connector_view" style="width:50%">
+  <img src="./images/Component&Connector.png" alt="component_connector_view" style="width:100%">
   <figcaption>Figure 2: Component and Connector View</figcaption>
 </figure>
 
 
+
 Figure 3 shows the <i>deployment view</i> of the system including how the system uses Digital Ocean and Docker for deployment. 
 <figure>
-  <img src="./images/deployment.png" alt="deployment_view" style="width:50%">
+  <img src="./images/deployment.png" alt="deployment_view" style="width:100%">
   <figcaption>Figure 3: Deployment View</figcaption>
 </figure>
+
 
 ## Dependencies
 
 Figure 4 shows the direct dependencies of the system including each tool’s [version] and license.
 
 <figure>
-  <img src="./images/DependencyDiagram.png" alt="dependency_view" style="width:50%">
+  <img src="./images/DependencyDiagram.png" alt="dependency_view" style="width:100%">
   <figcaption>Figure 4: Dependency View</figcaption>
 </figure>
+
 
 
 The application is implemented in Go. Go was chosen as it is good for writing web applications and working with API requests. Moreover, Go has better performance than Python which was used in the original version. The most essential tools and technologies that our system relies on are:
@@ -71,9 +75,10 @@ For logging the following tools have been identified as dependencies:
 The interactions between the subsystems are shown in a <i>sequence diagram</i> in Figure 5. The identified subsystems are: Monitoring, Logging, Database, API, Backend and UI. The diagram considers a specific scenario where the simulator sends a register request. Other scenarios could also have been explored, but since the interactions would be almost identical this scenario will suffice.
 
 <figure>
-  <img src="./images/Subsystem.png" alt="subsystem_view" style="width:50%">
+  <img src="./images/Subsystem.png" alt="subsystem_view" style="width:100%">
   <figcaption>Figure 5: Sequence diagram showing interaction of subsystem</figcaption>
 </figure>
+
 
 
 ## License
@@ -93,9 +98,10 @@ Furthermore, there have been issues with monitoring and logging on the deployed 
 
 Figure 6 shows a graph of the simulator status for all groups. The purple line shows the requests correctly handled by our system. The reason for the sudden change in the slope is covered in the lessons learned section.
 <figure>
-  <img src="./images/status.png" alt="simulator_status_graph" style="width:50%">
+  <img src="./images/status.png" alt="simulator_status_graph" style="width:100%">
   <figcaption>Figure 6: Simulator status graph</figcaption>
 </figure>
+
 
 
 # Process
@@ -121,9 +127,10 @@ We used the <i>merging topic branches staged</i> as the integration/merging work
 We decided to use the Git-flow branching model, where we have a <code>master</code> branch for storing versions and a branch <code>dev</code> for development. When working on a specific task we create a new feature branch from <code>dev</code>. When finished, the branch is merged into <code>dev</code> and deleted. Once we have a stable version we wish to release we merge from <code>dev</code> to <code>master</code>. Figure 7 shows an extract of our network from GitHub.
 
 <figure>
-  <img src="./images/branching.png" alt="network_graph" style="width:75%">
+  <img src="./images/branching.png" alt="network_graph" style="width:100%">
   <figcaption>Figure 7: Extract of Network Graph from GitHub</figcaption>
 </figure>
+
 
 
 The figure shows the <code>master</code> branch (black) and <code>dev</code> (blue) as well as three feature branches. To prevent major merge conflicts, we have sometimes merged a feature branch into another feature branch which deviates a bit from the Git-flow model. It has also happened that some changes have been made directly on <code>dev</code>.
@@ -140,17 +147,19 @@ Our CI/CD chain consists of two jobs: build and deploy. Each of these jobs consi
 ## Applied development process
 As our repository is located in GitHub we also chose to make use of the GitHub project board to keep track of outstanding tasks. Here we have created a Kanban board that consists of three columns *To do*, *Doing* and *Done*.  When encountering new tasks they were immediately added and assigned to one or more team members. This ensured that we maintained an overview of who was responsible for each task as well as whether they were in progress or completed. For some issues a checklist was added in case it consisted of multiple subtasks. Figure 8 shows an extract of the Kanban board.
 <figure>
-  <img src="./images/kanban_board.png" alt="network_graph" style="width:50%">
+  <img src="./images/kanban_board.png" alt="network_graph" style="width:100%">
   <figcaption>Figure 8: Extract of the Kanban board</figcaption>
 </figure>
+
 
 
 ## Monitoring
 For monitoring the system, the group has used Grafana and Prometheus. Prometheus is a storage backend that collects metrics from monitored targets, while Grafana is a visualization layer for the monitored data. Below we have listed the metrics that have been monitored for the application. These can be grouped into two categories, technical and business. The technical metrics are related to the performance and hardware information of the system, while the business category consists of statistical information related to the usage of the system. Figure 9 shows the Grafana dashboard.
 <figure>
-  <img src="./images/grafana.png" alt="grafana_dashboard" style="width:50%">
+  <img src="./images/grafana.png" alt="grafana_dashboard" style="width:100%">
   <figcaption>Figure 9: Screenshot from our Grafana dashboard</figcaption>
 </figure>
+
 
 
 - Technical:
@@ -169,18 +178,20 @@ For monitoring the system, the group has used Grafana and Prometheus. Prometheus
 ## Logging
 For the aggregation of logging in our system, the Elasticsearch-Filebeat-Kibana (EFK) stack is used. The EFK stack was chosen since it is open source and was recommended in the course. The processing of logs is shown in figure 10. We chose to send the data directly from Filebeat to Elasticsearch (removing Logstash from the stack) since it requires less parsing and transformation power. 
 <figure>
-  <img src="./images/log.png" alt="showing_efk" style="width:50%">
+  <img src="./images/log.png" alt="showing_efk" style="width:100%">
   <figcaption>Figure 10: Processing of logs with EFK</figcaption>
 </figure>
+
 
 
 Currently we are only logging errors, i.e. when an error happens with a database query or when an error occurs in the API. The plan was to extend this to also log successes. 
 
 At the moment, the logging does not work on the deployed version. We have been experiencing the error *"Failed to poll for work: [cluster_block_exception] index [.kibana_task_manager] blocked by: [FORBIDDEN/12/index read-only / allow delete (api)]; :: {\\\"path\\\"* and have not been able to find a proper solution to fix the error, therefore it only works locally. A screenshot of the Kibana dashboard is shown in figure 11.
 <figure>
-  <img src="./images/kibana.png" alt="kibana_dashboard" style="width:50%">
+  <img src="./images/kibana.png" alt="kibana_dashboard" style="width:100%">
   <figcaption>Figure 11: Kibana dashboard</figcaption>
 </figure>
+
 
 
 ## Security assessment
@@ -209,9 +220,10 @@ The scenarios that that were constructed and could be done by an attacker are fo
 
 When analysing the risks each scenario was given a grade for likelihood and impact. Figure 11 shows a risk matrix that was used to prioritise the risk of scenarios. The detailed ranking can be seen in the <a href="https://github.com/lauralunddahl/DevOps-GroupF/blob/master/documents/risk_analysis.md">risk_analysis.md</a> file but below the scenarios have been listed in a descending order based on the ratings they got along with the actions that should be taken to prevent them.
 <figure>
-  <img src="./images/risk_analysis.png" alt="risk_analysis" style="width:50%">
+  <img src="./images/risk_analysis.png" alt="risk_analysis" style="width:100%">
   <figcaption>Figure 11: Risk analysis matrix</figcaption>
 </figure>
+
 
 
 - Scenario 2: The Go package we are currently using in our program already sanitizes the input that is being used to query the database so as it is now, the input is already parameterized which is a good defence against SQL injections.
@@ -353,3 +365,87 @@ Kim et al (2016). [DevOps Handbook part 1](https://ituniversity-my.sharepoint.co
 | metrics/metrics.go:127:1: exported function IncrementUnfollows should have comment or be unexported |
 | metrics/metrics.go:131:1: exported function IncrementRequests should have comment or be unexported |
 | metrics/metrics.go:135:1: exported function ObserveResponseTime should have comment or be unexported |
+
+|      |
+| ---- |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
+|      |
