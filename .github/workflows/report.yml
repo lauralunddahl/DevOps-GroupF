@@ -20,7 +20,7 @@ jobs:
           input_dir: report
           output_dir: report/build
           images_dir: report/images
-          image_import: report/images
+          image_import: https://github.com/lauralunddahl/DevOps-GroupF/blob/master/report/images
           build_html: false
       - name: Commit PDF
         run: |
