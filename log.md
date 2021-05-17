@@ -41,8 +41,6 @@ We have chosen to use Docker (i.e. containers) instead of virtualizing hardware 
 isolate our code into a single container which can be run virtually anywhere. It makes it easier for us to update our app and will
 likely make it easier for us to introduce a CI/CD setup.
 
-Deployment target: ? (Ubuntu?)
-
 ### CI/CD setup
 
 We have chosen to use a continious integration system in which we can run automated builds and later on also automated tests.
