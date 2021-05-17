@@ -18,7 +18,6 @@ jobs:
           input_dir: report
           output_dir: report/build
           images_dir: report/images
-          image_import: ./images
           build_html: false
       - name: Commit PDF
         run: |
