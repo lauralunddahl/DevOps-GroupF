@@ -19,7 +19,7 @@ This section describes the design and architecture of our system through the 3+1
 
 Figure 1 shows the <i>module view</i> of our system in a <i>package diagram</i>. The Minitwit system is built around two packages: The API, and the Web Application. Each of these two packages includes respectively four packages. 
 <figure>
-  <img src="report/images/package.png" alt="package_view" style="width:100%">
+  <img src="./images/package.png" alt="package_view" style="width:100%">
   <figcaption>Figure 1: Package Diagram</figcaption>
 </figure>
 
