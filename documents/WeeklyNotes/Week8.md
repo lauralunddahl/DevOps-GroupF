@@ -1,6 +1,6 @@
 ## Dependency diagram
 
-<img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/WeeklyNotes/Dependencies.png"/>
+<img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/documents/WeeklyNotes/Dependencies.png"/>
 
 http://www.webgraphviz.com/
 
