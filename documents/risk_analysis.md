@@ -39,7 +39,7 @@ We summed up possible risk scenarios for our application they are following
 
 
 ## Risk Analysis
-<img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/WeeklyNotes/risk_analysis.png"/>
+<img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/documents/WeeklyNotes/risk_analysis.PNG"/>
 
 ### Determine likelihood
 The likelihood of most of these attacks are very low. How every it could happen that some malicious web crawler would find our website and attempt to Cross-site-script our website or do an SQL injection attack
@@ -49,7 +49,6 @@ The likelihood of most of these attacks are very low. How every it could happen 
 - Scenario 3: Unlikely
 - Scenario 4: Possible
 - Scenario 5: Possible
-  
 ### Determine impact
  - Scenario 1: Moderate
  - Scenario 2: Significant
@@ -58,7 +57,7 @@ The likelihood of most of these attacks are very low. How every it could happen 
  - Scenario 5: Significant
 
 ### Use a Risk Matrix to prioritize risk of scenarios
-  
+
  - Scenario 1: Risk(Possible, Moderate) = 6
  - Scenario 2: Risk(Likely, Significant) = 9
  - Scenario 3: Risk(Unlikely, Significant) = 7
@@ -70,7 +69,7 @@ Based on the ratings we get from the risk assessment matrix the prioritization o
 Scenario 2, Scenario 5, Scenario 3, Scenario 4 and Scenario 1
 
 ### Discuss what are you going to do about each of the scenarios
-    
+
 1.  **Scenario 2**: The go package we are currently using in our program already sanitizes the input that is being used to query the database so as it is now, the input is already parameterized which is a good defence against SQL injections.
     
 2.  **Scenario 5**: Change the password of the database so it is long and complicated making it difficult to brute force. Check if it is possible to add two-factor authentication.

@@ -18,30 +18,34 @@ This section describes the design and architecture of our system through the 3+1
 
 Figure 1 shows the <i>module view</i> of our system in a <i>package diagram</i>. The Minitwit system is built around two packages: The API, and the Web Application. Each of these two packages includes respectively four packages. 
 <figure>
-  <img src="https://i.imgur.com/akOyMhj.png" alt="package_view" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/package.png" alt="package_view" style="width:100%">
   <figcaption>Figure 1: Package Diagram</figcaption>
 </figure>
 
+
 Figure 2 shows the <i>component and connector view</i> of the system. Here it is shown that the system is accessible through the API with a simulator and the browser. 
 <figure>
-  <img src="https://i.imgur.com/tN851SI.png" alt="component_connector_view" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/Component%26Connector.png" alt="component_connector_view" style="width:100%">
   <figcaption>Figure 2: Component and Connector View</figcaption>
 </figure>
 
+
 Figure 3 shows the <i>deployment view</i> of the system including how the system uses Digital Ocean and Docker for deployment. 
 <figure>
-  <img src="https://i.imgur.com/cBMjTAM.png" alt="deployment_view" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/deployment.png" alt="deployment_view" style="width:100%">
   <figcaption>Figure 3: Deployment View</figcaption>
 </figure>
+
 
 ## Dependencies
 
 Figure 4 shows the direct dependencies of the system including each tool’s [version] and license.
 
 <figure>
-  <img src="https://i.imgur.com/c332bfd.png" alt="dependency_view" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/DependencyDiagram.png" alt="dependency_view" style="width:100%">
   <figcaption>Figure 4: Dependency View</figcaption>
 </figure>
+
 
 The application is implemented in Go. Go was chosen as it is good for writing web applications and working with API requests. Moreover, Go has better performance than Python which was used in the original version. The most essential tools and technologies that our system relies on are:
 
@@ -66,9 +70,10 @@ For logging the following tools have been identified as dependencies:
 The interactions between the subsystems are shown in a <i>sequence diagram</i> in Figure 5. The identified subsystems are: Monitoring, Logging, Database, API, Backend and UI. The diagram considers a specific scenario where the simulator sends a register request. Other scenarios could also have been explored, but since the interactions would be almost identical this scenario will suffice.
 
 <figure>
-  <img src="https://i.imgur.com/QYNZ6J8.png" alt="subsystem_view" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/Subsystem.png" alt="subsystem_view" style="width:100%">
   <figcaption>Figure 5: Sequence diagram showing interaction of subsystem</figcaption>
 </figure>
+
 
 ## License
 Before choosing the desired license, the advantages and disadvantages of the different licenses were discussed. From this, we found that the copyleft GPL license fits best with our vision. The GPL license is beneficial for individual contributors and often creates a community among them. By using the GPL license we still allow users to run, modify and share the software for free, but with the restriction that their improved versions must also stay free. This may discourage some larger organizations to use it, but since our software is a social media platform, we wish to create a community where we encourage cooperation and allow users to contribute freely while avoiding larger organizations turning it into proprietary software.
@@ -87,9 +92,10 @@ Furthermore, there have been issues with monitoring and logging on the deployed 
 
 Figure 6 shows a graph of the simulator status for all groups. The purple line shows the requests correctly handled by our system. The reason for the sudden change in the slope is covered in the lessons learned section.
 <figure>
-  <img src="https://i.imgur.com/Pd0nwJJ.png" alt="simulator_status_graph" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/status.png" alt="simulator_status_graph" style="width:100%">
   <figcaption>Figure 6: Simulator status graph</figcaption>
 </figure>
+
 
 # Process
 ## Interaction inbetween the team
@@ -114,9 +120,10 @@ We used the <i>merging topic branches staged</i> as the integration/merging work
 We decided to use the Git-flow branching model, where we have a <code>master</code> branch for storing versions and a branch <code>dev</code> for development. When working on a specific task we create a new feature branch from <code>dev</code>. When finished, the branch is merged into <code>dev</code> and deleted. Once we have a stable version we wish to release we merge from <code>dev</code> to <code>master</code>. Figure 7 shows an extract of our network from GitHub.
 
 <figure>
-  <img src="https://i.imgur.com/Dqzh3lM.png" alt="network_graph" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/branching.png" alt="network_graph" style="width:100%">
   <figcaption>Figure 7: Extract of Network Graph from GitHub</figcaption>
 </figure>
+
 
 The figure shows the <code>master</code> branch (black) and <code>dev</code> (blue) as well as three feature branches. To prevent major merge conflicts, we have sometimes merged a feature branch into another feature branch which deviates a bit from the Git-flow model. It has also happened that some changes have been made directly on <code>dev</code>.
 
@@ -132,16 +139,18 @@ Our CI/CD chain consists of two jobs: build and deploy. Each of these jobs consi
 ## Applied development process
 As our repository is located in GitHub we also chose to make use of the GitHub project board to keep track of outstanding tasks. Here we have created a Kanban board that consists of three columns *To do*, *Doing* and *Done*.  When encountering new tasks they were immediately added and assigned to one or more team members. This ensured that we maintained an overview of who was responsible for each task as well as whether they were in progress or completed. For some issues a checklist was added in case it consisted of multiple subtasks. Figure 8 shows an extract of the Kanban board.
 <figure>
-  <img src="https://i.imgur.com/UlmpdN3.png" alt="network_graph" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/kanban_board.png" alt="network_graph" style="width:100%">
   <figcaption>Figure 8: Extract of the Kanban board</figcaption>
 </figure>
+
 
 ## Monitoring
 For monitoring the system, the group has used Grafana and Prometheus. Prometheus is a storage backend that collects metrics from monitored targets, while Grafana is a visualization layer for the monitored data. Below we have listed the metrics that have been monitored for the application. These can be grouped into two categories, technical and business. The technical metrics are related to the performance and hardware information of the system, while the business category consists of statistical information related to the usage of the system. Figure 9 shows the Grafana dashboard.
 <figure>
-  <img src="https://i.imgur.com/OFw7Ijy.png" alt="grafana_dashboard" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/grafana.png" alt="grafana_dashboard" style="width:100%">
   <figcaption>Figure 9: Screenshot from our Grafana dashboard</figcaption>
 </figure>
+
 
 - Technical:
     - CPU load
@@ -159,17 +168,19 @@ For monitoring the system, the group has used Grafana and Prometheus. Prometheus
 ## Logging
 For the aggregation of logging in our system, the Elasticsearch-Filebeat-Kibana (EFK) stack is used. The EFK stack was chosen since it is open source and was recommended in the course. The processing of logs is shown in figure 10. We chose to send the data directly from Filebeat to Elasticsearch (removing Logstash from the stack) since it requires less parsing and transformation power. 
 <figure>
-  <img src="https://i.imgur.com/PYLt7I4.png" alt="showing_efk" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/log.png" alt="showing_efk" style="width:100%">
   <figcaption>Figure 10: Processing of logs with EFK</figcaption>
 </figure>
+
 
 Currently we are only logging errors, i.e. when an error happens with a database query or when an error occurs in the API. The plan was to extend this to also log successes. 
 
 At the moment, the logging does not work on the deployed version. We have been experiencing the error *"Failed to poll for work: [cluster_block_exception] index [.kibana_task_manager] blocked by: [FORBIDDEN/12/index read-only / allow delete (api)]; :: {\\\"path\\\"* and have not been able to find a proper solution to fix the error, therefore it only works locally. A screenshot of the Kibana dashboard is shown in figure 11.
 <figure>
-  <img src="https://i.imgur.com/o5vSt8T.png" alt="kibana_dashboard" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/kibana.png" alt="kibana_dashboard" style="width:100%">
   <figcaption>Figure 11: Kibana dashboard</figcaption>
 </figure>
+
 
 ## Security assessment
 When identifying the risks that the system is vulnerable to we started by identifying assets and threat sources and use that information to construct risk scenarios. The assets in the system that are possible targets for an attacker are most of the parts of the system, for example:
@@ -195,11 +206,12 @@ The scenarios that that were constructed and could be done by an attacker are fo
 4. Perform a DoS (Denial of service) attack on our web application, making it impossible for users to view the site. 
 5. Cracking the password to our database and delete or access information. Since our GitHub repository is public and includes all other information about the database it would only require bruteforcing the password.
 
-When analysing the risks each scenario was given a grade for likelihood and impact. Figure 11 shows a risk matrix that was used to prioritise the risk of scenarios. The detailed ranking can be seen in the <a href="https://github.com/lauralunddahl/DevOps-GroupF/blob/master/risk_analysis.md">risk_analysis.md</a> file but below the scenarios have been listed in a descending order based on the ratings they got along with the actions that should be taken to prevent them.
+When analysing the risks each scenario was given a grade for likelihood and impact. Figure 11 shows a risk matrix that was used to prioritise the risk of scenarios. The detailed ranking can be seen in the <a href="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/documents/risk_analysis.md">risk_analysis.md</a> file but below the scenarios have been listed in a descending order based on the ratings they got along with the actions that should be taken to prevent them.
 <figure>
-  <img src="https://i.imgur.com/06o45yl.png" alt="risk_analysis" style="width:100%">
+  <img src="https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/report/images/risk_analysis.png" alt="risk_analysis" style="width:100%">
   <figcaption>Figure 11: Risk analysis matrix</figcaption>
 </figure>
+
 
 - Scenario 2: The Go package we are currently using in our program already sanitizes the input that is being used to query the database so as it is now, the input is already parameterized which is a good defence against SQL injections.
 - Scenario 5: Change the password of the database so it is long and complicated making it difficult to brute force. Check if it is possible to add two-factor authentication.
@@ -235,7 +247,7 @@ It would have been beneficial to prioritize setting up the logging and monitorin
 After having set up the load balancer we learned that it is valuable to have two running droplets. This makes it possible to do maintenance on one while still having the other droplet running, so it does not affect the availability of the system.
 
 ## Reflection on DevOps style
-One of the approaches from the DevOps Handbook (Kim et al, 2016) that we have used in our project is having an emphasis on limiting the amount of tasks in progress. We have tried to focus on helping each other completing ongoing tasks before starting a new one. Furthermore, we tried to reduce batch sizes by continuously deploying whenever a task was completed. This was more straightforward once the CI/CD pipeline worked. Another thing also mentioned earlier is the use of a Kanban board, which has helped make our work visible. Further aspects are covered in [Week5.md](https://github.com/lauralunddahl/DevOps-GroupF/blob/master/WeeklyNotes/Week5.md).
+One of the approaches from the DevOps Handbook (Kim et al, 2016) that we have used in our project is having an emphasis on limiting the amount of tasks in progress. We have tried to focus on helping each other completing ongoing tasks before starting a new one. Furthermore, we tried to reduce batch sizes by continuously deploying whenever a task was completed. This was more straightforward once the CI/CD pipeline worked. Another thing also mentioned earlier is the use of a Kanban board, which has helped make our work visible. Further aspects are covered in [Week5.md](https://github.com/lauralunddahl/DevOps-GroupF/blob/dev/documents/WeeklyNotes/Week5.md).
 
 The main difference from previous projects has been the focus on the health/uptime/state of our system rather than solely on the functionality of the system. 
 
@@ -250,7 +262,6 @@ Christensen (2007). An Approach to Software Architecture Description Using UML (
 Edward S. (2019). [sqlite vs mysql whats the difference](https://www.hostinger.com/tutorials/sqlite-vs-mysql-whats-the-difference/) [Accessed 2021-02-27].
 
 Hammarberg M. (2013). [Mob-programming](http://codebetter.com/marcushammarberg/2013/08/06/mob-programming/) [Accessed on 2021-05-12].
-
 
 Kim et al (2016). [DevOps Handbook part 1](https://ituniversity-my.sharepoint.com/personal/ropf_itu_dk/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fropf%5Fitu%5Fdk%2FDocuments%2FDevOps%2C%20SW%20Evolution%20and%20SW%20Maintenance%2FDevOps%20Handbook%20Part%201%2Epdf&parent=%2Fpersonal%2Fropf%5Fitu%5Fdk%2FDocuments%2FDevOps%2C%20SW%20Evolution%20and%20SW%20Maintenance&originalPath=aHR0cHM6Ly9pdHVuaXZlcnNpdHktbXkuc2hhcmVwb2ludC5jb20vOmI6L2cvcGVyc29uYWwvcm9wZl9pdHVfZGsvRWFmZzRCNGFmYXhJcVlHRFlKcU9KTFFCeWNySVo4Sndrb2tGeTRqOUp1V2l1UT9ydGltZT1jbUhMSFRvWjJVZw) (First Edition). IT Revolution Press.
 
