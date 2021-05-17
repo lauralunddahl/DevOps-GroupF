@@ -2,6 +2,8 @@ name: Report to PDF
 
 on:
   push:
+    branches:
+      - master  
     paths:
       - 'report/report.md'
 
